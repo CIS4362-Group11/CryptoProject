@@ -4,6 +4,8 @@
 /* define standard library inclusions here */
 #include <iostream>
 #include <string>
+#include <map>
+#include <vector>
 
 using namespace std;
 

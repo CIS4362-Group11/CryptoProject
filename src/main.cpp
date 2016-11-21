@@ -2,9 +2,11 @@
 
 int main(int argc, char **argv)
 {
-    Module m;
-    m.test();
-    Example e;
-    e.test();
+    vector<string> t;
+    t.push_back("testing");
+    t.push_back("1");
+    t.push_back("2");
+    Module m(t);
+    m.run();
     return 0;
 }

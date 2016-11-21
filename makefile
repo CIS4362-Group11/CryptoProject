@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -g -Iinclude/
+CFLAGS=-std=c++11 -Wall -g -Iinclude/
 SD=src/
 ID=include/
 BD=build/
@@ -28,5 +28,3 @@ bd:
 clean:
 	if [ -x $(TARG) ]; then rm $(TARG); fi
 	rm -rf $(BD)*.o
-	rm -rf $(ID)*.gch
-	rm -rf $(ID)attacks/*.gch
