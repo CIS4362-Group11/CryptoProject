@@ -3,11 +3,13 @@
 /* if you add a module please register it
  * here by adding it to the mapping
  */
-void register_modules(map<string,Module> &m)
+void register_modules(map<string,Module*> &m)
 {
-    // attack registration
-    m.insert(make_pair("attacks/example", Example()));
-    m.insert(make_pair("attacks/example2", Example()));
+    // registering a dummy module, do not copy this
+    m.insert(make_pair("module", new Module()));
+
+    // attack registration, copy this for new modules
+    m.insert(make_pair("attacks/example", new Example()));
 }
 
 /* helper function to split strings */
@@ -22,7 +24,7 @@ void split(string &s, char delim, vector<string> &e)
 }
 
 /* main loop prompt */
-void prompt(int &alive, map<string,Module> &m, string &curr_m)
+void prompt(int &alive, map<string,Module*> &m, string &curr_m)
 {
     string buff;
     vector<string> tokens;
@@ -53,12 +55,12 @@ void prompt(int &alive, map<string,Module> &m, string &curr_m)
             if (curr_m.empty())
                 cout << "[-] Please select a module first" << endl;
             else
-                m[curr_m].disp_desc();
+                m[curr_m]->disp_desc();
         } else if (tokens[1] == "options" || tokens[1] == "o") {
             if (curr_m.empty())
                 cout << "[-] Please select a module first" << endl;
             else
-                m[curr_m].disp_opts();
+                m[curr_m]->disp_opts();
         }
     } else if (tokens[0] == "set") {
         if (tokens.size() < 3)
@@ -66,12 +68,15 @@ void prompt(int &alive, map<string,Module> &m, string &curr_m)
         else if (curr_m.empty())
             cout << "[-] Please select a module first" << endl;
         else
-            m[curr_m].set_opt_value(tokens[1], tokens[2]);
+            m[curr_m]->set_opt_value(tokens[1], tokens[2]);
     } else if (tokens[0] == "run" || tokens[0] == "r") {
         if (curr_m == "")
             cout << "[-] Please select a module first" << endl;
-        else
-            m[curr_m].run();
+        else {
+            int r = m[curr_m]->run();
+            if (r != 0)
+                cout << "[-] Module returned with non-zero error value: " << r << endl;
+        }
     } else if (tokens[0] == "clear" || tokens[0] == "c") {
             curr_m.clear();
     } else if (tokens[0] == "exit" || tokens[0] == "e" || tokens[0] == "quit" || tokens[0] == "q") {
@@ -84,8 +89,10 @@ void prompt(int &alive, map<string,Module> &m, string &curr_m)
 int main(int argc, char **argv)
 {
     int alive = 1;
-    map<string,Module> mods;
+    map<string,Module*> mods;
     string current_module = "";
+
+    cout << WELCOME << endl;
 
     // load modules
     register_modules(mods);

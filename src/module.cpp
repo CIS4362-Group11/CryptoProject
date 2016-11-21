@@ -13,7 +13,9 @@ void Module::set_opts(vector<string> &_options)
         options[*it] = "";
 }
 
-/* display options in a nice table */
+/* display options in a nice table
+ * needs work on formatting, rather crude
+  */
 void Module::disp_opts()
 {
     map<string,string>::iterator it = options.begin();

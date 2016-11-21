@@ -10,7 +10,11 @@
 
 using namespace std;
 
-/* all modules extend this class so no module should be above this */
+/* all modules need these files
+ * no created files should go above these
+ * following includes
+ */
+#include "const.h"
 #include "module.h"
 
 /* define inclusions of modules here */
