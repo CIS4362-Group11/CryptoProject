@@ -29,9 +29,9 @@ void Module::set_opt_value(string opt, string val)
 }
 
 /* This function is virtual and should be overwritten */
-void Module::show_help()
+void Module::disp_desc()
 {
-    cout << "[-] Help functionality has not been implemented." << endl;
+    cout << "[-] Description functionality has not been implemented." << endl;
 }
 
 /* This function is virtual and should be overwritten */

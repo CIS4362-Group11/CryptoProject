@@ -10,7 +10,7 @@ class Module {
         void set_opts(vector<string>&);
         void disp_opts();
         void set_opt_value(string, string);
-        virtual void show_help();
+        virtual void disp_desc();
         virtual int run();
 };
 
