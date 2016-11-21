@@ -3,7 +3,7 @@
 
 class Module {
     public:
-        void test();
+        virtual void test();
 };
 
 #endif

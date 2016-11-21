@@ -1,6 +1,6 @@
 #include "main.h"
 
-string example()
+void Example::test()
 {
-    return "example text";
+    cout << "example test" << endl;
 }

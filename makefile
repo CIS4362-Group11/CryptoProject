@@ -28,3 +28,5 @@ bd:
 clean:
 	if [ -x $(TARG) ]; then rm $(TARG); fi
 	rm -rf $(BD)*.o
+	rm -rf $(ID)*.gch
+	rm -rf $(ID)attacks/*.gch
