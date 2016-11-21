@@ -2,6 +2,7 @@
 
 int main(int argc, char **argv)
 {
-    cout << example() << endl;
+    Module m;
+    m.test();
     return 0;
 }

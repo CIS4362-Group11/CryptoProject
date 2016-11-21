@@ -7,6 +7,9 @@
 
 using namespace std;
 
+/* all modules extend this class so no module should be above this */
+#include "module.h"
+
 /* define inclusions of modules here */
 #include "attacks/example.h"
 
