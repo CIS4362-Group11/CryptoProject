@@ -58,7 +58,7 @@ int Example::run()
     cout << "[*] Writing..." << endl;
     while (!in.eof()) {
         getline(in, buff);
-        out << buff;
+        out << buff << endl;
     }
 
     cout << "[*] Closing files" << endl;
