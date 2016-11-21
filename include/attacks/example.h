@@ -3,6 +3,7 @@
 
 class Example : public Module {
     public:
+        Example();
         void test();
 };
 

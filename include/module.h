@@ -6,9 +6,10 @@ class Module {
         map<string,string> options;
 
     public:
-        Module(vector<string>&);
-        void set_opt();
+        Module();
+        void set_opts(vector<string>&);
         void disp_opts();
+        void set_opt_value(string, string);
         virtual void show_help();
         virtual int run();
 };

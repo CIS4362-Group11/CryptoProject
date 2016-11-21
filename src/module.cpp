@@ -1,23 +1,31 @@
 #include "main.h"
 
 /* Module constructor */
-Module::Module(vector<string> & _options)
+Module::Module()
+{
+    // nothing to do here
+}
+
+/* Used to initialize option values to empty strings */
+void Module::set_opts(vector<string> &_options)
 {
     for (vector<string>::iterator it = _options.begin(); it != _options.end(); it++)
         options[*it] = "";
 }
 
-void Module::set_opt()
-{
-
-}
-
+/* display options in a nice table */
 void Module::disp_opts()
 {
     map<string,string>::iterator it = options.begin();
     cout << "\t| Option\t\t| Value" << endl;
     for (; it != options.end(); it++)
         cout << "\t| " << it->first << "\t\t| " << it->second << endl;
+}
+
+/* set a particular option value, doesn't check if it doesn't exist */
+void Module::set_opt_value(string opt, string val)
+{
+    options[opt] = val;
 }
 
 /* This function is virtual and should be overwritten */
