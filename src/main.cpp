@@ -7,6 +7,7 @@ void register_modules(map<string,Module> &m)
 {
     // attack registration
     m.insert(make_pair("attacks/example", Example()));
+    m.insert(make_pair("attacks/example2", Example()));
 }
 
 /* helper function to split strings */
@@ -34,7 +35,9 @@ void prompt(int &alive, map<string,Module> &m, string &curr_m)
     split(buff, ' ', tokens);
 
     // parse tokens
-    if (tokens[0] == "use" || tokens[0] == "u") {
+    if (tokens.size() < 1) {
+        return;
+    } else if (tokens[0] == "use" || tokens[0] == "u") {
         if (tokens.size() < 2)
             cout << "[-] Please specify a module" << endl;
         else {
@@ -45,15 +48,32 @@ void prompt(int &alive, map<string,Module> &m, string &curr_m)
         }
     } else if(tokens[0] == "show" || tokens[0] == "s") {
         if (tokens.size() < 2)
-            cout << "[-] Please specify what information to show:\n\tdescription" << endl;
+            cout << "[-] Please specify what information to show:\n\tdescription\n\toptions" << endl;
         else if (tokens[1] == "description" || tokens[1] == "desc" || tokens[1] == "d") {
-            if (curr_m == "")
+            if (curr_m.empty())
                 cout << "[-] Please select a module first" << endl;
             else
                 m[curr_m].disp_desc();
+        } else if (tokens[1] == "options" || tokens[1] == "o") {
+            if (curr_m.empty())
+                cout << "[-] Please select a module first" << endl;
+            else
+                m[curr_m].disp_opts();
         }
+    } else if (tokens[0] == "set") {
+        if (tokens.size() < 3)
+            cout << "[-] Please specify option and value\n[-] Options can be listed with: show options" << endl;
+        else if (curr_m.empty())
+            cout << "[-] Please select a module first" << endl;
+        else
+            m[curr_m].set_opt_value(tokens[1], tokens[2]);
     } else if (tokens[0] == "run" || tokens[0] == "r") {
-        m[curr_m].run();
+        if (curr_m == "")
+            cout << "[-] Please select a module first" << endl;
+        else
+            m[curr_m].run();
+    } else if (tokens[0] == "clear" || tokens[0] == "c") {
+            curr_m.clear();
     } else if (tokens[0] == "exit" || tokens[0] == "e" || tokens[0] == "quit" || tokens[0] == "q") {
         alive = 0;
     } else {

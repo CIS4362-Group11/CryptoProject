@@ -25,7 +25,10 @@ void Module::disp_opts()
 /* set a particular option value, doesn't check if it doesn't exist */
 void Module::set_opt_value(string opt, string val)
 {
-    options[opt] = val;
+    if (options.find(opt) == options.end())
+        cout << "[-] Invalid option: " << opt << endl;
+    else
+        options[opt] = val;
 }
 
 /* This function is virtual and should be overwritten */
