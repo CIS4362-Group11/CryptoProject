@@ -1,4 +1,5 @@
 #include "main.h"
+#include "..\..\include\attacks\histogram.h"
 
 /* example constructor, sets some options */
 Histogram::Histogram()
@@ -14,7 +15,7 @@ Histogram::Histogram()
     set_opts(temp);
 
     // set default values, option must exist or error will printed
-    set_opt_value("OUTPUTFILE", "/tmp/histogram");
+    set_opt_value("OUTPUTFILE", "out/histogram");
 	set_opt_value("BLOCKSIZE", "1");
 	set_opt_value("CHARSETSIZE", "256");
 	set_opt_value("SORTED", "0");
@@ -50,8 +51,8 @@ int Histogram::run()
         return 2;
     }
 
-	int blockSize = std::stoi(options["BLOCKSIZE"]);
-	int charSetSize = std::stoi(options["CHARSETSIZE"]);
+	const int blockSize = std::stoi(options["BLOCKSIZE"]);
+	const int charSetSize = std::stoi(options["CHARSETSIZE"]);
 
 	if (blockSize < 1){
 		cout << "[-] Block size should be greater than 0" << endl;
@@ -68,58 +69,76 @@ int Histogram::run()
     ofstream out;
     string buff;
 
-    cout << "[*] Opening file: " << options["INPUTFILE"] << endl;
-    in.open(options["INPUTFILE"]);
-
-
-    cout << "[*] Processing input file..." << endl;
-	char inChar;
-	int blockIndex = 0, charIndex;
-    while (!in.eof()) {
-        in.get(inChar);
-		charIndex = ((inChar < 0)? (charSetSize + (int)inChar) : (int)inChar);
-		if (inChar < 0 || inChar > charSetSize) {
-			cout << "[-] Character set size option is smaller than actual size." << endl;
-			return 4;
-		}
-		charCounts[blockIndex][charIndex]++;
-		blockIndex = (blockIndex + 1) % blockSize;
-    }
-
-	cout << "[*] Analyzing input..." << endl;
-	vector<int> charCount(blockSize), maxLength(blockSize), maxCount(blockSize);
-
-	for (unsigned int blockIndex = 0; blockIndex < charCounts.size(); blockIndex++){
-		for (unsigned int charIndex = 0; charIndex < charCounts[blockIndex].size(); charIndex++){
-			int temp = charCounts[blockIndex][charIndex];
-			charCount[blockIndex] += temp;
-			if (temp > maxCount[blockIndex]) maxCount[blockIndex] = temp;
-		}
-
-		int maxCtCopy = maxCount[blockIndex];
-		while (maxCtCopy /= 10) maxLength[blockIndex]++;
+	if (process_input(&in, &charCounts, blockSize, charSetSize) != 0) {
+		return 4;
 	}
 
-
-    cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
-    out.open(options["OUTPUTFILE"]);
-
-	cout << "[*] Writing output..." << endl;
-
-	for (unsigned int blockIndex = 0; blockIndex < charCounts.size(); blockIndex++){
-		out << "Histogram for block index " << blockIndex << ": " << endl;
-		for (unsigned int charIndex = 0; charIndex < charCounts[blockIndex].size(); charIndex++){
-			int numSpaces = 0, temp = charCounts[blockIndex][charIndex];
-			while (temp /= 10) numSpaces++;
-			numSpaces = maxLength[blockIndex] - numSpaces;
-			out << charIndex << string(numSpaces+1, ' ') << charCounts[blockIndex][charIndex] << "; \n";
-		}
-	}
-
+	vector<int> charTotal(blockSize), maxLength(blockSize), maxCount(blockSize);
+	analyze_input(&charCounts, &charTotal, &maxLength, &maxCount);
+	
+	write_output(&out, &charCounts, &maxLength);
 
     cout << "[*] Closing files" << endl;
     in.close();
     out.close();
 
     return 0;
+}
+
+int Histogram::process_input(ifstream* in, vector< vector<int> >* charCounts, const int blockSize, const int charSetSize) {
+	cout << "[*] Opening file: " << options["INPUTFILE"] << endl;
+	in->open(options["INPUTFILE"]);
+
+
+	cout << "[*] Processing input file..." << endl;
+	char inChar;
+	int blockIndex = 0, charIndex;
+	while (!in->eof()) {
+		in->get(inChar);
+		charIndex = ((inChar < 0) ? (charSetSize + (int)inChar) : (int)inChar);
+		if (inChar < 0 || inChar > charSetSize) {
+			cout << "[-] Character set size option is smaller than actual size." << endl;
+			return 4;
+		}
+		(*charCounts)[blockIndex][charIndex]++;
+		blockIndex = (blockIndex + 1) % blockSize;
+	}
+
+	return 0;
+}
+
+int Histogram::analyze_input(vector< vector<int> >* charCounts, vector<int>* charTotal, vector<int>* maxLength, vector<int>* maxCount) {
+	cout << "[*] Analyzing input..." << endl;
+
+	for (unsigned int blockIndex = 0; blockIndex < charCounts->size(); blockIndex++) {
+		for (unsigned int charIndex = 0; charIndex < (*charCounts)[blockIndex].size(); charIndex++) {
+			int temp = (*charCounts)[blockIndex][charIndex];
+			(*charTotal)[blockIndex] += temp;
+			if (temp > (*maxCount)[blockIndex]) (*maxCount)[blockIndex] = temp;
+		}
+
+		int maxCtCopy = (*maxCount)[blockIndex];
+		while (maxCtCopy /= 10) (*maxLength)[blockIndex]++;
+	}
+
+	return 0;
+}
+
+int Histogram::write_output(ofstream* out, vector< vector<int> >* charCounts, vector<int>* maxLength) {
+	cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
+	out->open(options["OUTPUTFILE"]);
+
+	cout << "[*] Writing output..." << endl;
+
+	for (unsigned int blockIndex = 0; blockIndex < (*charCounts).size(); blockIndex++) {
+		(*out) << "Histogram for block index " << blockIndex << ": " << endl;
+		for (unsigned int charIndex = 0; charIndex < (*charCounts)[blockIndex].size(); charIndex++) {
+			int numSpaces = 0, temp = (*charCounts)[blockIndex][charIndex];
+			while (temp /= 10) numSpaces++;
+			numSpaces = (*maxLength)[blockIndex] - numSpaces;
+			(*out) << charIndex << "," << string(numSpaces + 1, ' ') << (*charCounts)[blockIndex][charIndex] << "; \n";
+		}
+	}
+
+	return 0;
 }

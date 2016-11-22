@@ -11,6 +11,10 @@ class Histogram : public Module {
         // here are the funcs I need to override
         void disp_desc();
         int run();
+
+		int process_input(ifstream* in, vector< vector<int> >* charCounts, const int blockSize, const int charSetSize);
+		int analyze_input(vector< vector<int> >* charCounts, vector<int>* charTotal, vector<int>* maxLength, vector<int>* maxCount);
+		int write_output(ofstream * out, vector<vector<int>>* charCounts, vector<int>* maxLength);
 };
 
 #endif
