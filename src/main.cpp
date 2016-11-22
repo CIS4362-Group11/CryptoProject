@@ -10,6 +10,7 @@ void register_modules(map<string,Module*> &m)
 
     // attack registration, copy this for new modules
     m.insert(make_pair("attacks/example", new Example()));
+	m.insert(make_pair("attacks/histogram", new Histogram()));
 }
 
 /* helper function to split strings */

@@ -3,7 +3,7 @@ CFLAGS=-std=c++11 -Wall -g -Iinclude/
 SD=src/
 ID=include/
 BD=build/
-ATTACKS=example.o
+ATTACKS=example.o histogram.o
 TARG=cryptoproject
 
 .PHONY: all clean bd
@@ -18,6 +18,9 @@ module.o: bd $(SD)module.cpp $(ID)module.h
 
 example.o: bd $(SD)attacks/example.cpp $(ID)attacks/example.h
 	$(CC) $(CFLAGS) -c $(SD)attacks/example.cpp -o $(BD)example.o
+
+histogram.o: bd $(SD)attacks/histogram.cpp $(ID)attacks/histogram.h
+	$(CC) $(CFLAGS) -c $(SD)attacks/histogram.cpp -o $(BD)histogram.o
 
 $(TARG): main.o module.o $(ATTACKS) $(TOOLS)
 	$(CC) $(CFLAGS) $(BD)main.o $(BD)module.o $(addprefix $(BD), $(ATTACKS)) $(addprefix $(BD), $(TOOLS)) -o $(TARG)
