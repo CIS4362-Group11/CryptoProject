@@ -51,8 +51,8 @@ int Histogram::run()
         return 2;
     }
 
-	const int blockSize = std::stoi(options["BLOCKSIZE"]);
-	const int charSetSize = std::stoi(options["CHARSETSIZE"]);
+	const int blockSize = stoi(options["BLOCKSIZE"]);
+	const int charSetSize = stoi(options["CHARSETSIZE"]);
 
 	if (blockSize < 1){
 		cout << "[-] Block size should be greater than 0" << endl;
@@ -76,7 +76,7 @@ int Histogram::run()
 	vector<int> charTotal(blockSize), maxLength(blockSize), maxCount(blockSize);
 	analyze_input(&charCounts, &charTotal, &maxLength, &maxCount);
 	
-	write_output(&out, &charCounts, &maxLength);
+	process_output(&out, &charCounts, &maxLength);
 
     cout << "[*] Closing files" << endl;
     in.close();
@@ -124,20 +124,62 @@ int Histogram::analyze_input(vector< vector<int> >* charCounts, vector<int>* cha
 	return 0;
 }
 
-int Histogram::write_output(ofstream* out, vector< vector<int> >* charCounts, vector<int>* maxLength) {
+int Histogram::process_output(ofstream* out, vector< vector<int> >* charCounts, vector<int>* maxLength) {
+	vector< vector<int> > charIndexArray((*charCounts).size());
+	vector<int> charIndexRef;
+
+	charIndexRef.resize((*charCounts)[0].size());
+	for (unsigned int charIndex = 0; charIndex < charIndexRef.size(); charIndex++) {
+		charIndexRef[charIndex] = charIndex;
+	}
+
+	/*
+	for (unsigned int blockIndex = 0; blockIndex < charIndexArray.size(); blockIndex++) {
+		charIndexArray[blockIndex].resize((*charCounts)[blockIndex].size());
+		for (unsigned int charIndex = 0; charIndex < charIndexArray[blockIndex].size(); charIndex++) {
+			charIndexArray[blockIndex][charIndex] = charIndex;
+		}
+	}
+	*/
+
 	cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
 	out->open(options["OUTPUTFILE"]);
 
 	cout << "[*] Writing output..." << endl;
 
 	for (unsigned int blockIndex = 0; blockIndex < (*charCounts).size(); blockIndex++) {
+		vector<int> charIndexTest = charIndexRef;
+		if (stoi(options["SORTED"]) != 0) {
+			sort_arrays(&((*charCounts)[blockIndex]), &charIndexTest);
+		}
+
+		cout << "sorted" << endl;
+
+
 		(*out) << "Histogram for block index " << blockIndex << ": " << endl;
 		for (unsigned int charIndex = 0; charIndex < (*charCounts)[blockIndex].size(); charIndex++) {
 			int numSpaces = 0, temp = (*charCounts)[blockIndex][charIndex];
 			while (temp /= 10) numSpaces++;
 			numSpaces = (*maxLength)[blockIndex] - numSpaces;
-			(*out) << charIndex << "," << string(numSpaces + 1, ' ') << (*charCounts)[blockIndex][charIndex] << "; \n";
+			(*out) << charIndexTest[charIndex] << "," << string(numSpaces + 1, ' ') << (*charCounts)[blockIndex][charIndex] << "; \n";
 		}
+	}
+
+	return 0;
+}
+
+int Histogram::sort_arrays(vector<int>* charCounts, vector<int>* charIndexArray) {
+	for (unsigned int mainIndex = 0; mainIndex < (*charCounts).size(); mainIndex++) {
+		int countValue = (*charCounts)[mainIndex],
+			countIndex = (*charIndexArray)[mainIndex],
+			swapIndex = mainIndex - 1;
+		while (swapIndex >= 0 && (*charCounts)[swapIndex] < countValue) {
+			(*charCounts)[swapIndex + 1] = (*charCounts)[swapIndex];
+			(*charIndexArray)[swapIndex + 1] = (*charIndexArray)[swapIndex];
+			swapIndex--;
+		}
+		(*charCounts)[swapIndex + 1] = countValue;
+		(*charIndexArray)[swapIndex + 1] = countIndex;
 	}
 
 	return 0;
