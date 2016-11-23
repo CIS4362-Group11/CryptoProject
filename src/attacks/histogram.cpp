@@ -1,5 +1,4 @@
 #include "main.h"
-#include "..\..\include\attacks\histogram.h"
 
 /* example constructor, sets some options */
 Histogram::Histogram()
