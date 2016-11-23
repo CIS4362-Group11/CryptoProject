@@ -4,6 +4,7 @@ SD=src/
 ID=include/
 BD=build/
 ATTACKS=example.o histogram.o
+VER=0.1
 TARG=cryptoproject
 
 .PHONY: all clean bd
@@ -11,7 +12,7 @@ TARG=cryptoproject
 all: $(TARG)
 
 main.o: bd $(SD)main.cpp $(ID)main.h
-	$(CC) $(CFLAGS) -c $(SD)main.cpp -o $(BD)main.o
+	$(CC) $(CFLAGS) -DVERSION=$(VER) -c $(SD)main.cpp -o $(BD)main.o
 
 module.o: bd $(SD)module.cpp $(ID)module.h
 	$(CC) $(CFLAGS) -c $(SD)module.cpp -o $(BD)module.o

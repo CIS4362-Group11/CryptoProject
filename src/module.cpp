@@ -13,15 +13,23 @@ void Module::set_opts(vector<string> &_options)
         options[*it] = "";
 }
 
+/* helper function for padding with spaces */
+string pad_string (string s, unsigned int size)
+{
+    while (s.size() < size)
+        s += " ";
+    return s;
+}
+
 /* display options in a nice table
- * needs work on formatting, rather crude
+ * pads option name to MAXOPTNAME
   */
 void Module::disp_opts()
 {
     map<string,string>::iterator it = options.begin();
-    cout << "\t| Option\t\t| Value" << endl;
+    cout << "\t| "<< pad_string("Option", MAXOPTNAME) << "| Value" << endl;
     for (; it != options.end(); it++)
-        cout << "\t| " << it->first << "\t\t| " << it->second << endl;
+        cout << "\t| " << pad_string(it->first, MAXOPTNAME) << "| " << it->second << endl;
 }
 
 /* set a particular option value, doesn't check if it doesn't exist */

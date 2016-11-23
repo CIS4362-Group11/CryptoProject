@@ -6,7 +6,7 @@
 void register_modules(map<string,Module*> &m)
 {
     // registering a dummy module, do not copy this
-    m.insert(make_pair("module", new Module()));
+    // m.insert(make_pair("module", new Module()));
 
     // attack registration, copy this for new modules
     m.insert(make_pair("attacks/example", new Example()));
@@ -51,7 +51,7 @@ void prompt(int &alive, map<string,Module*> &m, string &curr_m)
         }
     } else if(tokens[0] == "show" || tokens[0] == "s") {
         if (tokens.size() < 2)
-            cout << "[-] Please specify what information to show:\n\tdescription\n\toptions" << endl;
+            cout << "[-] Please specify what information to show:\n\tmodules\n\tdescription\n\toptions" << endl;
         else if (tokens[1] == "description" || tokens[1] == "desc" || tokens[1] == "d") {
             if (curr_m.empty())
                 cout << "[-] Please select a module first" << endl;
@@ -62,6 +62,11 @@ void prompt(int &alive, map<string,Module*> &m, string &curr_m)
                 cout << "[-] Please select a module first" << endl;
             else
                 m[curr_m]->disp_opts();
+        } else if (tokens[1] == "modules" || tokens[1] == "m") {
+            cout << "Available Modules:" << endl;
+            map<string,Module*>::iterator it = m.begin();
+            while (it != m.end())
+                cout << "\t" << (it++)->first << endl;
         }
     } else if (tokens[0] == "set") {
         if (tokens.size() < 3)
@@ -79,7 +84,9 @@ void prompt(int &alive, map<string,Module*> &m, string &curr_m)
                 cout << "[-] Module returned with non-zero error value: " << r << endl;
         }
     } else if (tokens[0] == "clear" || tokens[0] == "c") {
-            curr_m.clear();
+        curr_m.clear();
+    } else if (tokens[0] == "help" || tokens[0] == "h") {
+        cout << HELPTEXT << endl;
     } else if (tokens[0] == "exit" || tokens[0] == "e" || tokens[0] == "quit" || tokens[0] == "q") {
         alive = 0;
     } else {
@@ -93,10 +100,16 @@ int main(int argc, char **argv)
     map<string,Module*> mods;
     string current_module = "";
 
+    // welcome information and version
     cout << WELCOME << endl;
+    cout << "[*] Version " << VERSION << endl;
 
     // load modules
     register_modules(mods);
+    cout << "[*] Loaded " << mods.size() << " modules" << endl;
+
+    // help
+    cout << "[*] Type 'help' to see available commands" << endl;
 
     // main loop
     while (alive)
