@@ -11,15 +11,15 @@ Histogram::Histogram()
 	temp.push_back("BLOCKSIZE");
 	temp.push_back("CHARSETSIZE");
 	temp.push_back("SORTED");
-	temp.push_back("FREQUENCIES");
+	temp.push_back("SHOWFREQUENCY");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
-    set_opt_value("OUTPUTFILE", "out/histogram");
+    set_opt_value("OUTPUTFILE", "histogram");
 	set_opt_value("BLOCKSIZE", "1");
 	set_opt_value("CHARSETSIZE", "256");
 	set_opt_value("SORTED", "0");
-	set_opt_value("FREQUENCIES", "0");
+	set_opt_value("SHOWFREQUENCY", "0");
 }
 
 /* helper function that doesn't really do anything */
@@ -76,7 +76,7 @@ int Histogram::run()
 	vector<int> charTotal(blockSize), maxLength(blockSize), maxCount(blockSize);
 	analyze_input(&charCounts, &charTotal, &maxLength, &maxCount);
 	
-	process_output(&out, &charCounts, &maxLength);
+	process_output(&out, &charCounts, &charTotal, &maxLength);
 
     cout << "[*] Closing files" << endl;
     in.close();
@@ -124,23 +124,12 @@ int Histogram::analyze_input(vector< vector<int> >* charCounts, vector<int>* cha
 	return 0;
 }
 
-int Histogram::process_output(ofstream* out, vector< vector<int> >* charCounts, vector<int>* maxLength) {
-	vector< vector<int> > charIndexArray((*charCounts).size());
+int Histogram::process_output(ofstream* out, vector< vector<int> >* charCounts, vector<int>* charTotal, vector<int>* maxLength) {
 	vector<int> charIndexRef;
-
 	charIndexRef.resize((*charCounts)[0].size());
 	for (unsigned int charIndex = 0; charIndex < charIndexRef.size(); charIndex++) {
 		charIndexRef[charIndex] = charIndex;
 	}
-
-	/*
-	for (unsigned int blockIndex = 0; blockIndex < charIndexArray.size(); blockIndex++) {
-		charIndexArray[blockIndex].resize((*charCounts)[blockIndex].size());
-		for (unsigned int charIndex = 0; charIndex < charIndexArray[blockIndex].size(); charIndex++) {
-			charIndexArray[blockIndex][charIndex] = charIndex;
-		}
-	}
-	*/
 
 	cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
 	out->open(options["OUTPUTFILE"]);
@@ -148,20 +137,24 @@ int Histogram::process_output(ofstream* out, vector< vector<int> >* charCounts, 
 	cout << "[*] Writing output..." << endl;
 
 	for (unsigned int blockIndex = 0; blockIndex < (*charCounts).size(); blockIndex++) {
-		vector<int> charIndexTest = charIndexRef;
+		vector<int> charIndexTemp = charIndexRef;
 		if (stoi(options["SORTED"]) != 0) {
-			sort_arrays(&((*charCounts)[blockIndex]), &charIndexTest);
+			sort_arrays(&((*charCounts)[blockIndex]), &charIndexTemp);
 		}
 
-		cout << "sorted" << endl;
-
-
 		(*out) << "Histogram for block index " << blockIndex << ": " << endl;
+		
 		for (unsigned int charIndex = 0; charIndex < (*charCounts)[blockIndex].size(); charIndex++) {
-			int numSpaces = 0, temp = (*charCounts)[blockIndex][charIndex];
-			while (temp /= 10) numSpaces++;
-			numSpaces = (*maxLength)[blockIndex] - numSpaces;
-			(*out) << charIndexTest[charIndex] << "," << string(numSpaces + 1, ' ') << (*charCounts)[blockIndex][charIndex] << "; \n";
+			if (stoi(options["SHOWFREQUENCY"]) == 0) {
+				int numSpaces = 0, temp = (*charCounts)[blockIndex][charIndex];
+				while (temp /= 10) numSpaces++;
+				numSpaces = (*maxLength)[blockIndex] - numSpaces;
+				(*out) << charIndexTemp[charIndex] << "," << string(numSpaces + 1, ' ') << (*charCounts)[blockIndex][charIndex] << "; \n";
+			}
+			else {
+				float percent = ((float)(*charCounts)[blockIndex][charIndex] / (float)(*charTotal)[blockIndex]) * 100;
+				(*out) << fixed << charIndexTemp[charIndex] << ", "<< percent << "; \n";
+			}
 		}
 	}
 
@@ -173,11 +166,13 @@ int Histogram::sort_arrays(vector<int>* charCounts, vector<int>* charIndexArray)
 		int countValue = (*charCounts)[mainIndex],
 			countIndex = (*charIndexArray)[mainIndex],
 			swapIndex = mainIndex - 1;
+
 		while (swapIndex >= 0 && (*charCounts)[swapIndex] < countValue) {
 			(*charCounts)[swapIndex + 1] = (*charCounts)[swapIndex];
 			(*charIndexArray)[swapIndex + 1] = (*charIndexArray)[swapIndex];
 			swapIndex--;
 		}
+
 		(*charCounts)[swapIndex + 1] = countValue;
 		(*charIndexArray)[swapIndex + 1] = countIndex;
 	}
