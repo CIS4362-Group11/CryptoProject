@@ -6,7 +6,7 @@
 void register_modules(map<string,Module*> &m)
 {
     // registering a dummy module, do not copy this
-    m.insert(make_pair("module", new Module()));
+    // m.insert(make_pair("module", new Module()));
 
     // attack registration, copy this for new modules
     m.insert(make_pair("attacks/example", new Example()));
