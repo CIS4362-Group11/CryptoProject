@@ -62,6 +62,11 @@ void prompt(int &alive, map<string,Module*> &m, string &curr_m)
                 cout << "[-] Please select a module first" << endl;
             else
                 m[curr_m]->disp_opts();
+        } else if (tokens[1] == "modules" || tokens[1] == "m") {
+            cout << "Available Modules:" << endl;
+            map<string,Module*>::iterator it = m.begin();
+            while (it != m.end())
+                cout << "\t" << (it++)->first << endl;
         }
     } else if (tokens[0] == "set") {
         if (tokens.size() < 3)
