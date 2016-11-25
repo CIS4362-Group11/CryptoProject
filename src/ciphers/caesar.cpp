@@ -8,10 +8,12 @@ Caesar::Caesar()
     temp.push_back("INPUTFILE");
     temp.push_back("OUTPUTFILE");
     temp.push_back("KEY");
+    temp.push_back("DECRYPT");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
     set_opt_value("OUTPUTFILE", "encrypted.txt");
+    set_opt_value("DECRYPT", "0");
 }
 
 /* I am overriding the default module function
@@ -19,8 +21,7 @@ Caesar::Caesar()
  */
 void Caesar::disp_desc()
 {
-    cout << "Module: attacks/example\n\tThis is an example module to show the abilities of the system.\n\tThis is some basic description text that is displayed when show description is input.\n\tThis program will just copy the info from one file to another.\n\tPlease define INPUTFILE for this example module to run correctly.\n\tOptions are given below:" << endl;
-    disp_opts();
+    cout << "Module: ciphers/caesar\n\tEncrypts (or decrypts) a text file with the caesar cipher.\n\tPlease define the following required options:\n\t\tINPUTFILE\tinput filename\n\t\tKEY\t\tinteger key between 1 and 25" << endl;
     cout << endl;
 }
 
@@ -29,6 +30,12 @@ void Caesar::disp_desc()
  */
 int Caesar::run()
 {
+    ifstream in;
+    ofstream out;
+    string ibuff, obuff;
+    int key = stoi(options["KEY"]), r = 0;
+    bool decrypt = false;
+
     // perform error checking on options first
     if (options["INPUTFILE"].empty()) {
         cout << "[-] Please specify an input file" << endl;
@@ -40,25 +47,67 @@ int Caesar::run()
         return 2;
     }
 
-    ifstream in;
-    ofstream out;
-    string buff;
+    if (options["KEY"].empty() || stoi(options["KEY"]) <= 0 || stoi(options["KEY"]) > 25 ) {
+        cout << "[-] Please specify an integer key value between 1 and 25" << endl;
+        return 3;
+    }
 
-    cout << "[*] Opening file: " << options["INPUTFILE"] << endl;
+    if (options["DECRYPT"] == "1")
+        decrypt = true;
+    else if (options["DECRYPT"] == "0")
+        decrypt = false;
+    else {
+        cout << "[-] Invalid DECRYPT value (must be 0 or 1)" << endl;
+        return 4;
+    }
+
+    cout << "[*] Opening input file: " << options["INPUTFILE"] << endl;
     in.open(options["INPUTFILE"]);
 
-    cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
+    if (!in.good()) {
+        cout << "[-] Input file error" << endl;
+        return 5;
+    }
+
+    cout << "[*] Opening output file: " << options["OUTPUTFILE"] << endl;
     out.open(options["OUTPUTFILE"]);
 
-    cout << "[*] Writing..." << endl;
+    // not sure about this gotta check
+    if (decrypt)
+        key = 26 - key;
+
+    cout << "[*] Encrypting..." << endl;
     while (!in.eof()) {
-        getline(in, buff);
-        out << buff << endl;
+        getline(in, ibuff);
+        r = encrypt(ibuff, obuff, key);
+        if (r != 0) {
+            cout << "[-] Error while processing input file" << endl;
+            return 6;
+        }
+        out << obuff << endl;
     }
 
     cout << "[*] Closing files" << endl;
     in.close();
     out.close();
 
+    return 0;
+}
+
+/* implementation of caesar cipher
+ * made static so anyone can use, helpful for attacks
+ * input string must be lowercase
+ * output string will be uppercase
+ */
+int Caesar::encrypt(string &in, string &out, int key)
+{
+    // clear output buffer
+    out.clear();
+
+    const char *ti = in.c_str();
+    for (unsigned int i = 0; i < in.size(); i++) {
+        char c = tolower(ti[i]);
+        out += c;
+    }
     return 0;
 }
