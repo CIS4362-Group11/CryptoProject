@@ -3,7 +3,7 @@ CFLAGS=-std=c++11 -Wall -g -Iinclude/
 SD=src/
 ID=include/
 BD=build/
-ATTACKS=example.o histogram.o
+ATTACKS=example.o histogram.o caesar.o
 VER=0.1
 TARG=cryptoproject
 
@@ -22,6 +22,9 @@ example.o: bd $(SD)attacks/example.cpp $(ID)attacks/example.h
 
 histogram.o: bd $(SD)attacks/histogram.cpp $(ID)attacks/histogram.h
 	$(CC) $(CFLAGS) -c $(SD)attacks/histogram.cpp -o $(BD)histogram.o
+
+caesar.o: bd $(SD)ciphers/caesar.cpp $(ID)ciphers/caesar.h
+	$(CC) $(CFLAGS) -c $(SD)ciphers/caesar.cpp -o $(BD)caesar.o
 
 $(TARG): main.o module.o $(ATTACKS) $(TOOLS)
 	$(CC) $(CFLAGS) $(BD)main.o $(BD)module.o $(addprefix $(BD), $(ATTACKS)) $(addprefix $(BD), $(TOOLS)) -o $(TARG)

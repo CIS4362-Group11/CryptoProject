@@ -21,5 +21,6 @@ using namespace std;
 /* define inclusions of modules here */
 #include "attacks/example.h"
 #include "attacks/histogram.h"
+#include "ciphers/caesar.h"
 
 #endif
