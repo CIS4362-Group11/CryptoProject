@@ -72,13 +72,10 @@ int Caesar::run()
     cout << "[*] Opening output file: " << options["OUTPUTFILE"] << endl;
     out.open(options["OUTPUTFILE"]);
 
-    // not sure about this gotta check
-    if (decrypt)
-        key = 26 - key;
-
-    cout << "[*] Encrypting..." << endl;
+    if (!decrypt) cout << "[*] Encrypting..." << endl;
+    else cout << "[*] Decrypting..." << endl;
     while (getline(in, ibuff)) {
-        encrypt(ibuff, obuff, key);
+        encrypt(ibuff, obuff, key, decrypt);
         out << obuff << endl;
     }
 
@@ -94,16 +91,29 @@ int Caesar::run()
  * input string must be lowercase
  * output string will be uppercase
  */
-void Caesar::encrypt(string &in, string &out, int key)
+void Caesar::encrypt(string &in, string &out, int key, bool decrypt)
 {
     // clear output buffer
     out.clear();
 
     const char *ti = in.c_str();
     for (unsigned int i = 0; i < in.size(); i++) {
-        char c = tolower(ti[i]);
-        if (isalpha(c)) {
-            c = toupper(c);
+        char c;
+        if (!decrypt) {
+            c = tolower(ti[i]);
+            if (isalpha(c)) {
+                int tc = ((int) c) - 97;
+                tc = ((tc + key) % 26) + 97;
+                c = toupper((char) tc);
+            }
+        } else {
+            c = toupper(ti[i]);
+            if (isalpha(c)) {
+                int tc = ((int) c) - 65;
+                tc = (tc - key) + 65;
+                if (tc < 65) tc += 26;
+                c = tolower((char) tc);
+            }
         }
         out += c;
     }
