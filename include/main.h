@@ -8,6 +8,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <ctype.h>
 
 using namespace std;
 

@@ -33,7 +33,7 @@ int Caesar::run()
     ifstream in;
     ofstream out;
     string ibuff, obuff;
-    int key = stoi(options["KEY"]), r = 0;
+    int key = stoi(options["KEY"]);
     bool decrypt = false;
 
     // perform error checking on options first
@@ -77,13 +77,8 @@ int Caesar::run()
         key = 26 - key;
 
     cout << "[*] Encrypting..." << endl;
-    while (!in.eof()) {
-        getline(in, ibuff);
-        r = encrypt(ibuff, obuff, key);
-        if (r != 0) {
-            cout << "[-] Error while processing input file" << endl;
-            return 6;
-        }
+    while (getline(in, ibuff)) {
+        encrypt(ibuff, obuff, key);
         out << obuff << endl;
     }
 
@@ -99,7 +94,7 @@ int Caesar::run()
  * input string must be lowercase
  * output string will be uppercase
  */
-int Caesar::encrypt(string &in, string &out, int key)
+void Caesar::encrypt(string &in, string &out, int key)
 {
     // clear output buffer
     out.clear();
@@ -107,7 +102,9 @@ int Caesar::encrypt(string &in, string &out, int key)
     const char *ti = in.c_str();
     for (unsigned int i = 0; i < in.size(); i++) {
         char c = tolower(ti[i]);
+        if (isalpha(c)) {
+            c = toupper(c);
+        }
         out += c;
     }
-    return 0;
 }

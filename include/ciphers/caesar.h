@@ -5,7 +5,7 @@ class Caesar : public Module {
     public:
         Caesar();
 
-        static int encrypt(string&, string&, int);
+        static void encrypt(string&, string&, int);
 
         void disp_desc();
         int run();
