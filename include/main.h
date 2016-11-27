@@ -23,5 +23,6 @@ using namespace std;
 #include "attacks/example.h"
 #include "attacks/histogram.h"
 #include "ciphers/caesar.h"
+#include "ciphers/vigenere.h"
 
 #endif

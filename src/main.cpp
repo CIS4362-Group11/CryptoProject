@@ -12,6 +12,7 @@ void register_modules(map<string,Module*> &m)
     m.insert(make_pair("attacks/example", new Example()));
 	m.insert(make_pair("attacks/histogram", new Histogram()));
     m.insert(make_pair("ciphers/caesar", new Caesar()));
+    m.insert(make_pair("ciphers/vigenere", new Vigenere()));
 }
 
 /* helper function to split strings */
