@@ -21,7 +21,7 @@ Caesar::Caesar()
  */
 void Caesar::disp_desc()
 {
-    cout << "Module: ciphers/caesar\n\tEncrypts (or decrypts) a text file with the caesar cipher.\n\tPlease define the following required options:\n\t\tINPUTFILE\tinput filename\n\t\tKEY\t\tinteger key between 1 and 25" << endl;
+    cout << "Module: ciphers/caesar\n\tEncrypts (or decrypts) a text file with the caesar cipher.\n\tInput text should be lowercase, symbols are ignored.\n\tCipher text is all uppercase.\n\tPlease define the following required options:\n\t\tINPUTFILE\tinput filename\n\t\tKEY\t\tinteger key between 1 and 25" << endl;
     cout << endl;
 }
 
