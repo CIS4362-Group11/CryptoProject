@@ -33,7 +33,6 @@ int Vigenere::run()
     ifstream in;
     ofstream out;
     string ibuff, obuff;
-    int key = stoi(options["KEY"]);
     bool decrypt = false;
 
     // perform error checking on options first
@@ -47,8 +46,8 @@ int Vigenere::run()
         return 2;
     }
 
-    if (options["KEY"].empty() || stoi(options["KEY"]) <= 0 || stoi(options["KEY"]) > 25 ) {
-        cout << "[-] Please specify an integer key value between 1 and 25" << endl;
+    if (options["KEY"].empty()) {
+        cout << "[-] Please a key" << endl;
         return 3;
     }
 
@@ -74,8 +73,14 @@ int Vigenere::run()
 
     if (!decrypt) cout << "[*] Encrypting..." << endl;
     else cout << "[*] Decrypting..." << endl;
+    unsigned int key_index = 0;
+    vector<int> key;
+    for (unsigned int i = 0; i < options["key"].size(); i++)
+        if (isalpha(options["key"][i]))
+            key.push_back(tolower(options["key"][i]) - 97);
+
     while (getline(in, ibuff)) {
-        encrypt(ibuff, obuff, key, decrypt);
+        encrypt(ibuff, obuff, key, key_index, decrypt);
         out << obuff << endl;
     }
 
@@ -91,30 +96,30 @@ int Vigenere::run()
  * input string must be lowercase
  * output string will be uppercase
  */
-void Vigenere::encrypt(string &in, string &out, int key, bool decrypt)
+void Vigenere::encrypt(string &in, string &out, vector<int> &key, unsigned int &key_index, bool decrypt)
 {
     // clear output buffer
     out.clear();
 
-    const char *ti = in.c_str();
     for (unsigned int i = 0; i < in.size(); i++) {
         char c;
         if (!decrypt) {
-            c = tolower(ti[i]);
+            c = tolower(in[i]);
             if (isalpha(c)) {
                 int tc = ((int) c) - 97;
-                tc = ((tc + key) % 26) + 97;
+                tc = ((tc + key[key_index++]) % 26) + 97;
                 c = toupper((char) tc);
             }
         } else {
-            c = toupper(ti[i]);
+            c = toupper(in[i]);
             if (isalpha(c)) {
                 int tc = ((int) c) - 65;
-                tc = (tc - key) + 65;
+                tc = (tc - key[key_index++]) + 65;
                 if (tc < 65) tc += 26;
                 c = tolower((char) tc);
             }
         }
+        if (key_index >= key.size()) key_index = 0;
         out += c;
     }
 }
