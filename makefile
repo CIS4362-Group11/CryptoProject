@@ -3,7 +3,7 @@ CFLAGS=-std=c++11 -Wall -g -Iinclude/
 SD=src/
 ID=include/
 BD=build/
-ATTACKS=example.o histogram.o
+ATTACKS=example.o histogram.o caesar_attack.o
 CIPHERS=caesar.o vigenere.o
 VER=0.1
 TARG=cryptoproject
@@ -29,6 +29,9 @@ caesar.o: bd $(SD)ciphers/caesar.cpp $(ID)ciphers/caesar.h
 
 vigenere.o: bd $(SD)ciphers/vigenere.cpp $(ID)ciphers/vigenere.h
 	$(CC) $(CFLAGS) -c $(SD)ciphers/vigenere.cpp -o $(BD)vigenere.o
+
+caesar_attack.o: bd $(SD)attacks/caesar_attack.cpp $(ID)attacks/caesar_attack.h
+	$(CC) $(CFLAGS) -c $(SD)attacks/caesar_attack.cpp -o $(BD)caesar_attack.o
 
 $(TARG): main.o module.o $(ATTACKS) $(CIPHERS) $(TOOLS)
 	$(CC) $(CFLAGS) $(BD)main.o $(BD)module.o $(addprefix $(BD), $(ATTACKS)) $(addprefix $(BD), $(CIPHERS)) -o $(TARG)

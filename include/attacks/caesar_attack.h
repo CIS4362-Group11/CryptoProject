@@ -1,12 +1,9 @@
-#ifndef EXAMPLE_H
-#define EXAMPLE_H
+#ifndef CAESAR_ATTACK_H
+#define CAESAR_ATTACK_H
 
-class Example : public Module {
+class CaesarAttack : public Module {
     public:
-        Example();
-
-        // here is a helper func that I will use
-        void test();
+        CaesarAttack();
 
         // here are the funcs I need to override
         void disp_desc();

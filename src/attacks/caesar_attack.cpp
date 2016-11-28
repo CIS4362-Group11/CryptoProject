@@ -1,7 +1,7 @@
 #include "main.h"
 
 /* example constructor, sets some options */
-Example::Example()
+CaesarAttack::CaesarAttack()
 {
     // declare options, keep options as uppercase
     vector<string> temp;
@@ -10,29 +10,22 @@ Example::Example()
     set_opts(temp);
 
     // set default values, option must exist or error will printed
-    set_opt_value("OUTPUTFILE", "/tmp/cryptotmpfile");
-}
-
-/* helper function that doesn't really do anything */
-void Example::test()
-{
-    cout << "example test" << endl;
+    set_opt_value("OUTPUTFILE", "caesarattackresults.txt");
 }
 
 /* I am overriding the default module function
  * for displaying the description text
  */
-void Example::disp_desc()
+void CaesarAttack::disp_desc()
 {
-    cout << "Module: attacks/example\n\tThis is an example module to show the abilities of the system.\n\tThis is some basic description text that is displayed when show description is input.\n\tThis program will just copy the info from one file to another.\n\tPlease define INPUTFILE for this example module to run correctly.\n\tOptions are given below:" << endl;
-    disp_opts();
+    cout << "Module: attacks/caesar_attack\n\tThis module attempts to guess the correct shift for the Caesar cipher.\n\tIt makes use of frequency analysis to determine a proper guess.\n\tMay require user interaction.\n\tPlease define an INPUTFILE." << endl;
     cout << endl;
 }
 
 /* overrides the virtual function from Module
  * this is where the real meaty stuff happens
  */
-int Example::run()
+int CaesarAttack::run()
 {
     // perform error checking on options first
     if (options["INPUTFILE"].empty()) {
