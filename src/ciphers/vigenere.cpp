@@ -47,9 +47,10 @@ int Vigenere::run()
     }
 
     if (options["KEY"].empty()) {
-        cout << "[-] Please a key" << endl;
+        cout << "[-] Please specify a key" << endl;
         return 3;
     }
+    string tkey = options["KEY"];
 
     if (options["DECRYPT"] == "1")
         decrypt = true;
@@ -75,13 +76,14 @@ int Vigenere::run()
     else cout << "[*] Decrypting..." << endl;
     unsigned int key_index = 0;
     vector<int> key;
-    for (unsigned int i = 0; i < options["key"].size(); i++)
-        if (isalpha(options["key"][i]))
-            key.push_back(tolower(options["key"][i]) - 97);
-
-    for (int j = 0; j < key.size(); j++)
-        cout << key[j];
-    cout << endl;
+    for (unsigned int i = 0; i < tkey.size(); i++) {
+        if (isalpha(tkey[i]))
+            key.push_back( ((int) tolower(tkey[i])) - 97 );
+        else {
+            cout << "[-] Invalid key" << endl;
+            return 6;
+        }
+    }
 
     while (getline(in, ibuff)) {
         encrypt(ibuff, obuff, key, key_index, decrypt);
