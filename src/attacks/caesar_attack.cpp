@@ -105,7 +105,7 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
     }
 
     /* insertion sort */
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 26; i++) {
         int j = i;
         while (j > 0 && csq[mins[j-1]] > csq[mins[j]]) {
             int temp = mins[j-1];
@@ -114,6 +114,9 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
             j--;
         }
     }
+
+    // for (int i = 0; i < 26; i++)
+    //     cout << "\t" << mins[i] << "\t" << csq[mins[i]] << endl;
 
     string ans;
     cout << "[+] Most likely shift: " << mins[0] << endl;
