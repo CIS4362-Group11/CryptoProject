@@ -3,7 +3,8 @@ CFLAGS=-std=c++11 -Wall -g -Iinclude/
 SD=src/
 ID=include/
 BD=build/
-ATTACKS=example.o histogram.o caesar.o
+ATTACKS=example.o histogram.o
+CIPHERS=caesar.o vigenere.o
 VER=0.1
 TARG=cryptoproject
 
@@ -26,8 +27,11 @@ histogram.o: bd $(SD)attacks/histogram.cpp $(ID)attacks/histogram.h
 caesar.o: bd $(SD)ciphers/caesar.cpp $(ID)ciphers/caesar.h
 	$(CC) $(CFLAGS) -c $(SD)ciphers/caesar.cpp -o $(BD)caesar.o
 
-$(TARG): main.o module.o $(ATTACKS) $(TOOLS)
-	$(CC) $(CFLAGS) $(BD)main.o $(BD)module.o $(addprefix $(BD), $(ATTACKS)) $(addprefix $(BD), $(TOOLS)) -o $(TARG)
+vigenere.o: bd $(SD)ciphers/vigenere.cpp $(ID)ciphers/vigenere.h
+	$(CC) $(CFLAGS) -c $(SD)ciphers/vigenere.cpp -o $(BD)vigenere.o
+
+$(TARG): main.o module.o $(ATTACKS) $(CIPHERS) $(TOOLS)
+	$(CC) $(CFLAGS) $(BD)main.o $(BD)module.o $(addprefix $(BD), $(ATTACKS)) $(addprefix $(BD), $(CIPHERS)) -o $(TARG)
 
 bd:
 	@if [ ! -d $(BD) ]; then mkdir $(BD); fi

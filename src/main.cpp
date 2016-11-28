@@ -12,6 +12,7 @@ void register_modules(map<string,Module*> &m)
     m.insert(make_pair("attacks/example", new Example()));
 	m.insert(make_pair("attacks/histogram", new Histogram()));
     m.insert(make_pair("ciphers/caesar", new Caesar()));
+    m.insert(make_pair("ciphers/vigenere", new Vigenere()));
 }
 
 /* helper function to split strings */
@@ -80,9 +81,13 @@ void prompt(int &alive, map<string,Module*> &m, string &curr_m)
         if (curr_m == "")
             cout << "[-] Please select a module first" << endl;
         else {
-            int r = m[curr_m]->run();
-            if (r != 0)
-                cout << "[-] Module returned with non-zero error value: " << r << endl;
+            try {
+                int r = m[curr_m]->run();
+                if (r != 0)
+                    cout << "[-] Module returned with non-zero error value: " << r << endl;
+            } catch (const exception &e) {
+                cout << "[-] Caught fatal error from module: " << e.what() << endl;
+            }
         }
     } else if (tokens[0] == "clear" || tokens[0] == "c") {
         curr_m.clear();
