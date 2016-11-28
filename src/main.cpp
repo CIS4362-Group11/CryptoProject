@@ -11,7 +11,7 @@ void register_modules(map<string,Module*> &m)
     // registration, copy this for new modules
     m.insert(make_pair("attacks/example", new Example()));
 	m.insert(make_pair("attacks/histogram", new Histogram()));
-    m.insert(make_pair("attacks/caesar_attack", new CaesarAttack()));
+    m.insert(make_pair("attacks/caesar", new CaesarAttack()));
     m.insert(make_pair("ciphers/caesar", new Caesar()));
     m.insert(make_pair("ciphers/vigenere", new Vigenere()));
 }
