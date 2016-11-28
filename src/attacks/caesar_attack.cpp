@@ -45,9 +45,6 @@ int CaesarAttack::run()
     cout << "[*] Opening input file: " << options["INPUTFILE"] << endl;
     in.open(options["INPUTFILE"]);
 
-    cout << "[*] Opening output file: " << options["OUTPUTFILE"] << endl;
-    out.open(options["OUTPUTFILE"]);
-
     cout << "[*] Beginning attack..." << endl;
     begin_attack(in, out);
 
@@ -121,21 +118,41 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
     string ans;
     cout << "[+] Most likely shift: " << mins[0] << endl;
 
-    cout << "[*] Decrypting file..." << endl;
+    for (int i = 0; i < 26; i++) {
+        cout << "[*] Decrypting file with shift" << mins[i] << "..." << endl;
 
-    // reset input
-    in.clear();
-    in.seekg(0);
+        out.open(options["OUTPUTFILE"]);
 
-    string obuff;
-    int samplecount = 0;
-    cout << "[*] Sample from decryption: " << endl;
-    while (getline(in, buff)) {
-        Caesar::encrypt(buff, obuff, mins[0], true);
-        out << obuff << endl;
-        if (samplecount < 5) {
-            cout << obuff << endl;
-            samplecount++;
+        // reset input
+        in.clear();
+        in.seekg(0);
+
+        string obuff;
+        int samplecount = 0;
+        cout << "[*] Sample from decryption: " << endl;
+        while (getline(in, buff)) {
+            Caesar::encrypt(buff, obuff, mins[i], true);
+            out << obuff << endl;
+            if (samplecount < 5) {
+                cout << obuff << endl;
+                samplecount++;
+            } else {
+                break;
+            }
         }
+
+        string ans;
+        cout << "[*] Continue decryption? [Y/n]: ";
+        getline(cin, ans);
+        if (ans == "N" || ans == "n")
+            continue;
+
+        while (getline(in, buff)) {
+            Caesar::encrypt(buff, obuff, mins[i], true);
+            out << obuff << endl;
+        }
+
+        // if we get here we are done
+        break;
     }
 }
