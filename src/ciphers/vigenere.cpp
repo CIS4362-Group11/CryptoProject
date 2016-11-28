@@ -79,6 +79,10 @@ int Vigenere::run()
         if (isalpha(options["key"][i]))
             key.push_back(tolower(options["key"][i]) - 97);
 
+    for (int j = 0; j < key.size(); j++)
+        cout << key[j];
+    cout << endl;
+
     while (getline(in, ibuff)) {
         encrypt(ibuff, obuff, key, key_index, decrypt);
         out << obuff << endl;
