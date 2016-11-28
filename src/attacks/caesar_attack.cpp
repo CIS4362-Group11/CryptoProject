@@ -128,8 +128,14 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
     in.seekg(0);
 
     string obuff;
+    int samplecount = 0;
+    cout << "[*] Sample from decryption: " << endl;
     while (getline(in, buff)) {
         Caesar::encrypt(buff, obuff, mins[0], true);
         out << obuff << endl;
+        if (samplecount < 5) {
+            cout << obuff << endl;
+            samplecount++;
+        }
     }
 }
