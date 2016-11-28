@@ -61,7 +61,11 @@ int CaesarAttack::run()
 /* handles the main attack sequence */
 void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
 {
+    /* from analyzing huckleberry finn */
+    float english[] = {0.0834423, 0.0169666, 0.0191698, 0.0539923, 0.112034, 0.0180501, 0.0246394, 0.0602159, 0.0646833, 0.00280142, 0.0130094, 0.0398317, 0.0236778, 0.0747964, 0.0835958, 0.0138107, 0.000442449, 0.0464413, 0.057629, 0.0967157, 0.0318857, 0.00675638, 0.03031, 0.0011919, 0.0234859, 0.00042439};
+    
     int freq[26] = {0}, count = 0;
+    float ffreq[26] = {0.0f};
     string buff;
 
     while (getline(in, buff)) {
@@ -73,6 +77,8 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
         }
     }
 
-    for (int i = 0; i < 26; i++)
-        cout << freq[i] << endl;
+    for (int i = 0; i < 26; i++) {
+        ffreq[i] = (float)freq[i]/(float)count;
+        out << ffreq[i] << endl;
+    }
 }
