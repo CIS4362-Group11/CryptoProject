@@ -8,6 +8,9 @@ class CaesarAttack : public Module {
         // here are the funcs I need to override
         void disp_desc();
         int run();
+
+    private:
+        void begin_attack(ifstream&, ofstream&);
 };
 
 #endif

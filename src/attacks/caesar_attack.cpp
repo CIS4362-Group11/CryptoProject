@@ -10,7 +10,7 @@ CaesarAttack::CaesarAttack()
     set_opts(temp);
 
     // set default values, option must exist or error will printed
-    set_opt_value("OUTPUTFILE", "caesarattackresults.txt");
+    set_opt_value("OUTPUTFILE", "/tmp/caesarattackresults.txt");
 }
 
 /* I am overriding the default module function
@@ -42,21 +42,37 @@ int CaesarAttack::run()
     ofstream out;
     string buff;
 
-    cout << "[*] Opening file: " << options["INPUTFILE"] << endl;
+    cout << "[*] Opening input file: " << options["INPUTFILE"] << endl;
     in.open(options["INPUTFILE"]);
 
-    cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
+    cout << "[*] Opening output file: " << options["OUTPUTFILE"] << endl;
     out.open(options["OUTPUTFILE"]);
 
-    cout << "[*] Writing..." << endl;
-    while (!in.eof()) {
-        getline(in, buff);
-        out << buff << endl;
-    }
+    cout << "[*] Beginning attack..." << endl;
+    begin_attack(in, out);
 
     cout << "[*] Closing files" << endl;
     in.close();
     out.close();
 
     return 0;
+}
+
+/* handles the main attack sequence */
+void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
+{
+    int freq[26] = {0}, count = 0;
+    string buff;
+
+    while (getline(in, buff)) {
+        for (unsigned int i = 0; i < buff.size(); i++) {
+            if (isalpha(buff[i])) {
+                int t = ((int) tolower(buff[i])) - 97;
+                freq[t]++; count++;
+            }
+        }
+    }
+
+    for (int i = 0; i < 26; i++)
+        cout << freq[i] << endl;
 }
