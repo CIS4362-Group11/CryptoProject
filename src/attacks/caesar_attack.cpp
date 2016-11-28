@@ -119,7 +119,7 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
     cout << "[+] Most likely shift: " << mins[0] << endl;
 
     for (int i = 0; i < 26; i++) {
-        cout << "[*] Decrypting file with shift" << mins[i] << "..." << endl;
+        cout << "[*] Decrypting file with shift " << mins[i] << " (chi^2 = " << csq[mins[i]] << ")..." << endl;
 
         out.open(options["OUTPUTFILE"]);
 
