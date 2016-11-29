@@ -95,7 +95,7 @@ int Histogram::process_input(ifstream* in, vector< vector<int> >* charCounts, co
 	while (!in->eof()) {
 		in->get(inChar);
 		charIndex = ((inChar < 0) ? (charSetSize + (int)inChar) : (int)inChar);
-		if (inChar < 0 || inChar > charSetSize) {
+		if (charIndex < 0 || charIndex > charSetSize) {
 			cout << "[-] Character set size option is smaller than actual size." << endl;
 			return 4;
 		}
