@@ -7,10 +7,12 @@ CaesarAttack::CaesarAttack()
     vector<string> temp;
     temp.push_back("INPUTFILE");
     temp.push_back("OUTPUTFILE");
+    temp.push_back("ASSUMEYES");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
     set_opt_value("OUTPUTFILE", "/tmp/caesarattackresults.txt");
+    set_opt_value("ASSUMEYES", "0");
 }
 
 /* I am overriding the default module function
@@ -36,6 +38,11 @@ int CaesarAttack::run()
     if (options["OUTPUTFILE"].empty()) {
         cout << "[-] Please specify an output file" << endl;
         return 2;
+    }
+
+    if (options["ASSUMEYES"].empty() || stoi(options["ASSUMEYES"]) < 0 || stoi(options["ASSUMEYES"]) > 1) {
+        cout << "[-] Please specify an ASSUMEYES value of 0 or 1" << endl;
+        return 3;
     }
 
     ifstream in;
@@ -140,12 +147,14 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
             }
         }
 
-        string ans;
-        cout << "[*] Continue decryption? [Y/n]: ";
-        getline(cin, ans);
-        if (ans == "N" || ans == "n") {
-            out.close();
-            continue;
+        if (!stoi(options["ASSUMEYES"])) {
+            string ans;
+            cout << "[*] Continue decryption? [Y/n]: ";
+            getline(cin, ans);
+            if (ans == "N" || ans == "n") {
+                out.close();
+                continue;
+            }
         }
 
         while (getline(in, buff)) {
