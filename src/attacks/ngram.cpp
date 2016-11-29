@@ -9,7 +9,8 @@ Ngram::Ngram()
     temp.push_back("OUTPUTFILE");
 	temp.push_back("N-SIZE");
 	temp.push_back("CHARSETSIZE");
-	temp.push_back("MIN_OCCURENCES");
+	temp.push_back("MINOCCURENCES");
+	temp.push_back("OUTPUTHEX");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
@@ -17,7 +18,8 @@ Ngram::Ngram()
     set_opt_value("OUTPUTFILE", "ngram");
 	set_opt_value("N-SIZE", "2");
 	set_opt_value("CHARSETSIZE", "256");
-	set_opt_value("MIN_OCCURENCES", "20");
+	set_opt_value("MINOCCURENCES", "2");
+	set_opt_value("OUTPUTHEX", "0");
 }
 
 /* helper function that doesn't really do anything */
@@ -31,7 +33,7 @@ void Ngram::test()
  */
 void Ngram::disp_desc()
 {
-	cout << "Module: attacks/ngram\n\tThis module aids in the generation of N-gram counts to identify likely.\n\tOutput is generated in a CSV format of \"VALUE,OCCURENCES;\"\n\tThe N-SIZE option is used to determine the number of contiguous letters to consider. Space requirement grows quadratically in the n-gram length.\n\tThe CHARSETSIZE option is used to set the maximum range of the n-gram analysis.\n\t" << endl;
+	cout << "Module: attacks/ngram\n\tThis module aids in the generation of N-gram counts to identify likely.\n\tOutput is generated in a CSV format of \"VALUE,OCCURENCES;\"\n\tThe N-SIZE option is used to determine the number of contiguous letters to consider.\n\tThe CHARSETSIZE option is used to set the maximum range of the n-gram analysis.\n\t" << endl;
     disp_opts();
     cout << endl;
 }
@@ -71,7 +73,7 @@ int Ngram::run()
 	//vector<int> charTotal(nSize), maxLength(nSize), maxCount(nSize);
 	//analyze_input(&charCounts, &charTotal, &maxLength, &maxCount);
 	
-	//process_output(&out, &charCounts, &charTotal, &maxLength);
+	process_output(&out, &charCounts, charSetSize);
 
     cout << "[*] Closing files" << endl;
     in.close();
@@ -87,104 +89,68 @@ int Ngram::process_input(ifstream* in, vector< int >* charCounts, const int nSiz
 
 	cout << "[*] Processing input file..." << endl;
 	char inChar;
-	int bufferIndex = 0, blockIndex = 0, charIndex;
+	int bufferIndex = 0, charIndex;
 	vector<int> charBuffer(nSize);
 	while (!in->eof()) {
 		in->get(inChar);
 		charIndex = ((inChar < 0) ? (charSetSize + (int)inChar) : (int)inChar);
-		if (inChar < 0 || inChar > charSetSize) {
+		if (charIndex < 0 || charIndex > charSetSize) {
 			cout << "[-] Character set size option is smaller than actual size." << endl;
 			return 4;
 		}
 
 		charBuffer[bufferIndex] = inChar;
+		int arrayIndex = 0;
 		for (int i = 0; i < nSize; i++) {
-			cout << (char)charBuffer[(bufferIndex + (i + 1)) % nSize];
+			arrayIndex += charBuffer[(bufferIndex + (i + 1)) % nSize] * pow(charSetSize, nSize - (i + 1));
 		}
-		cout << endl;
 
-		//(*charCounts)[]
-
-
+		(*charCounts)[arrayIndex]++;
 		bufferIndex = ((bufferIndex + 1) % nSize);
-
-
-		//(*charCounts)[blockIndex][charIndex]++;
-		//blockIndex = (blockIndex + 1) % nSize;
 	}
 
 	return 0;
 }
 
-int Ngram::analyze_input(vector< vector<int> >* charCounts, vector<int>* charTotal, vector<int>* maxLength, vector<int>* maxCount) {
-	cout << "[*] Analyzing input..." << endl;
-
-	for (unsigned int blockIndex = 0; blockIndex < charCounts->size(); blockIndex++) {
-		for (unsigned int charIndex = 0; charIndex < (*charCounts)[blockIndex].size(); charIndex++) {
-			int temp = (*charCounts)[blockIndex][charIndex];
-			(*charTotal)[blockIndex] += temp;
-			if (temp > (*maxCount)[blockIndex]) (*maxCount)[blockIndex] = temp;
-		}
-
-		int maxCtCopy = (*maxCount)[blockIndex];
-		while (maxCtCopy /= 10) (*maxLength)[blockIndex]++;
-	}
-
-	return 0;
-}
-
-int Ngram::process_output(ofstream* out, vector< vector<int> >* charCounts, vector<int>* charTotal, vector<int>* maxLength) {
-	vector<int> charIndexRef;
-	charIndexRef.resize((*charCounts)[0].size());
-	for (unsigned int charIndex = 0; charIndex < charIndexRef.size(); charIndex++) {
-		charIndexRef[charIndex] = charIndex;
-	}
+int Ngram::process_output(ofstream* out, vector<int>* charCounts, const int charSetSize) {
 
 	cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
 	out->open(options["OUTPUTFILE"]);
 
 	cout << "[*] Writing output..." << endl;
 
-	for (unsigned int blockIndex = 0; blockIndex < (*charCounts).size(); blockIndex++) {
-		vector<int> charIndexTemp = charIndexRef;
-		if (stoi(options["SORTED"]) != 0) {
-			sort_arrays(&((*charCounts)[blockIndex]), &charIndexTemp);
-		}
-
-		(*out) << "Ngram for block index " << blockIndex << ": " << endl;
-		
-		for (unsigned int charIndex = 0; charIndex < (*charCounts)[blockIndex].size(); charIndex++) {
-			if (stoi(options["SHOWFREQUENCY"]) == 0) {
-				int numSpaces = 0, temp = (*charCounts)[blockIndex][charIndex];
-				while (temp /= 10) numSpaces++;
-				numSpaces = (*maxLength)[blockIndex] - numSpaces;
-				(*out) << charIndexTemp[charIndex] << "," << string(numSpaces + 1, ' ') << (*charCounts)[blockIndex][charIndex] << "; \n";
+	for (unsigned int charIndex = 0; charIndex < (*charCounts).size(); charIndex++) {
+		if ((*charCounts)[charIndex] >= stoi(options["MINOCCURENCES"])) {
+			string ngram = "";
+			int charValue = 0, charIndexCopy = charIndex;
+			while (charIndexCopy > 0) {
+				charValue = charIndexCopy % charSetSize;
+				charIndexCopy /= charSetSize;
+				if (stoi(options["OUTPUTHEX"]) == 0) {
+					ngram = to_string(charValue) + ngram;
+				}
+				else {
+					ngram = conv_int_to_hex(charValue) + ngram;
+				}
 			}
-			else {
-				float percent = ((float)(*charCounts)[blockIndex][charIndex] / (float)(*charTotal)[blockIndex]) * 100;
-				(*out) << fixed << charIndexTemp[charIndex] << ", "<< percent << "; \n";
-			}
+			(*out) << ngram << "," << (*charCounts)[charIndex] << endl;
 		}
 	}
 
 	return 0;
 }
 
-int Ngram::sort_arrays(vector<int>* charCounts, vector<int>* charIndexArray) {
-	for (unsigned int mainIndex = 0; mainIndex < (*charCounts).size(); mainIndex++) {
-		int countValue = (*charCounts)[mainIndex],
-			countIndex = (*charIndexArray)[mainIndex],
-			swapIndex = mainIndex - 1;
-
-		while (swapIndex >= 0 && (*charCounts)[swapIndex] < countValue) {
-			(*charCounts)[swapIndex + 1] = (*charCounts)[swapIndex];
-			(*charIndexArray)[swapIndex + 1] = (*charIndexArray)[swapIndex];
-			swapIndex--;
+string Ngram::conv_int_to_hex(int input) {
+	string hexOut = (input <= 16) ? "0" : "";
+	while (input > 0) {
+		int indexVal = input % 16;
+		if (indexVal > 9) {
+			hexOut += (char)('A' + (indexVal - 10));
 		}
-
-		(*charCounts)[swapIndex + 1] = countValue;
-		(*charIndexArray)[swapIndex + 1] = countIndex;
+		else {
+			hexOut = to_string(indexVal) + hexOut;
+		}
+		input /= 16;
 	}
-
-	return 0;
+	return hexOut;
 }

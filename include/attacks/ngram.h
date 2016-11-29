@@ -13,9 +13,8 @@ class Ngram : public Module {
         int run();
 
 		int process_input(ifstream* in, vector< int >* charCounts, const int blockSize, const int charSetSize);
-		int analyze_input(vector< vector<int> >* charCounts, vector<int>* charTotal, vector<int>* maxLength, vector<int>* maxCount);
-		int process_output(ofstream * out, vector<vector<int>>* charCounts, vector<int>* charTotal, vector<int>* maxLength);
-		int sort_arrays(vector<int>* charCounts, vector<int>* charIndexArray);
+		int process_output(ofstream* out, vector<int>* charCounts, const int charSetSize);
+		string conv_int_to_hex(int input);
 };
 
 #endif
