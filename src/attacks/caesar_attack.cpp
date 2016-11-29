@@ -72,7 +72,7 @@ void left_shift_freq(float *freq)
     float temp = freq[0];
     for (int i = 0; i < 25; i++)
         freq[i] = freq[i+1];
-    freq[26] = temp;
+    freq[25] = temp;
 }
 
 /* handles the main attack sequence */
@@ -96,49 +96,6 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
 
     for (int i = 0; i < 26; i++)
         ffreq[i] = (float)freq[i]/(float)count;
-
-    int max = 0;
-    for (int j = 1; j < 26; j++)
-        if (ffreq[j] > ffreq[max])
-            max = j;
-    int maxkey = (max-4 < 0) ? max-4+26 : max-4;
-    cout << "[*] Guessing based on 'e' frequency" << endl;
-    cout << "[*] Decrypting file with shift " << maxkey << "..." << endl;
-
-    out.open(options["OUTPUTFILE"]);
-
-    // reset input
-    in.clear();
-    in.seekg(0);
-
-    string obuff;
-    int samplecount = 0;
-    cout << "[*] Sample from decryption: " << endl;
-    while (getline(in, buff)) {
-        Caesar::encrypt(buff, obuff, maxkey, true);
-        out << obuff << endl;
-        if (samplecount < 5) {
-            cout << obuff << endl;
-            samplecount++;
-        } else {
-            break;
-        }
-    }
-
-    string ans;
-    cout << "[*] Continue decryption? [Y/n]: ";
-    getline(cin, ans);
-    if (ans == "Y" || ans == "y") {
-        while (getline(in, buff)) {
-            Caesar::encrypt(buff, obuff, maxkey, true);
-            out << obuff << endl;
-        }
-
-        return;
-    }
-
-    out.close();
-    cout << "[*] Falling back to chi^2 analysis..." << endl;
 
     int mins[26]; float csq[26];
     for (int i = 0; i < 26; i++) {
