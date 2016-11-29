@@ -14,11 +14,10 @@ Ngram::Ngram()
     set_opts(temp);
 
     // set default values, option must exist or error will printed
-	set_opt_value("INPUTFILE", "makefile");
     set_opt_value("OUTPUTFILE", "ngram");
 	set_opt_value("N-SIZE", "2");
 	set_opt_value("CHARSETSIZE", "256");
-	set_opt_value("MINOCCURENCES", "2");
+	set_opt_value("MINOCCURENCES", "20");
 	set_opt_value("OUTPUTHEX", "0");
 }
 
