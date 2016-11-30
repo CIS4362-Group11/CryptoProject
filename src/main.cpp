@@ -121,7 +121,7 @@ int parse_args(int argc, char **argv, string &cm, map<string,Module*> &m)
             run = true;
     }
 
-    for (int i = 0; i < tokens.size(); i++) {
+    for (unsigned int i = 0; i < tokens.size(); i++) {
         vector<string> pair;
         split(tokens[i], ':', pair);
         if (pair.size() != 2) {
