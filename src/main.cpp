@@ -101,18 +101,49 @@ void prompt(int &alive, map<string,Module*> &m, string &curr_m)
     }
 }
 
+/* parse command line args */
+int parse_args(int argc, char **argv, string &cm, map<string,Module*> &m)
+{
+    bool run = false;
+    for (int i = 1; i < argc; i++) {
+        if (strlen(argv[i]) > 2 && memcmp(argv[i], "-m", 2) == 0) {
+            char *temp = &argv[i][2];
+            if (m.find(temp) == m.end()) {
+                cout << "[-] Invalid module name" << endl;
+                return 1;
+            } else {
+                cm = temp;
+            }
+        } else if (strlen(argv[i]) > 2 && memcmp(argv[i], "-o", 2) == 0) {
+
+        } else if (strcmp(argv[i], "-r") == 0)
+            run = true;
+    }
+
+    if (run) {
+        m[cm]->run();
+        return 1;
+    } else
+        return 0;
+}
+
 int main(int argc, char **argv)
 {
     int alive = 1;
     map<string,Module*> mods;
     string current_module = "";
 
+    // load modules
+    register_modules(mods);
+
+    if (parse_args(argc, argv, current_module, mods)) return 0;
+
     // welcome information and version
     cout << WELCOME << endl;
     cout << "[*] Version " << VERSION << endl;
 
-    // load modules
-    register_modules(mods);
+    // number of loaded modules
+    // modules loaded earlier so parse_args can use it
     cout << "[*] Loaded " << mods.size() << " modules" << endl;
 
     // help
