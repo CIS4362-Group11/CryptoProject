@@ -134,9 +134,8 @@ int parse_args(int argc, char **argv, string &cm, map<string,Module*> &m)
         }
     }
 
-    if (run) {
-        if (!cm.empty()) m[cm]->run();
-        else cout << "[-] No module specified" << endl;
+    if (run && !cm.empty()) {
+        m[cm]->run();
         return 1;
     } else
         return 0;
