@@ -102,18 +102,63 @@ void prompt(int &alive, map<string,Module*> &m, string &curr_m)
     }
 }
 
+/* parse command line args */
+int parse_args(int argc, char **argv, string &cm, map<string,Module*> &m)
+{
+    bool run = false;
+    vector<string> tokens;
+    for (int i = 1; i < argc; i++) {
+        if (strlen(argv[i]) > 2 && memcmp(argv[i], "-m", 2) == 0) {
+            if (m.find(&argv[i][2]) == m.end()) {
+                cout << "[-] Invalid module name" << endl;
+                return 1;
+            } else {
+                cm = &argv[i][2];
+            }
+        } else if (strlen(argv[i]) > 2 && memcmp(argv[i], "-o", 2) == 0) {
+            string temp = &argv[i][2];
+            split(temp, ',', tokens);
+        } else if (strcmp(argv[i], "-r") == 0)
+            run = true;
+    }
+
+    for (unsigned int i = 0; i < tokens.size(); i++) {
+        vector<string> pair;
+        split(tokens[i], ':', pair);
+        if (pair.size() != 2) {
+            cout << "[-] Invalid option pair" << endl;
+            return 1;
+        } else if (cm.empty()) {
+            cout << "[-] Cannot use -o without -m, dropping option: " << pair[0] << endl;
+        } else {
+            m[cm]->set_opt_value(pair[0], pair[1]);
+        }
+    }
+
+    if (run && !cm.empty()) {
+        m[cm]->run();
+        return 1;
+    } else
+        return 0;
+}
+
 int main(int argc, char **argv)
 {
     int alive = 1;
     map<string,Module*> mods;
     string current_module = "";
 
+    // load modules
+    register_modules(mods);
+
+    if (parse_args(argc, argv, current_module, mods)) return 0;
+
     // welcome information and version
     cout << WELCOME << endl;
     cout << "[*] Version " << VERSION << endl;
 
-    // load modules
-    register_modules(mods);
+    // number of loaded modules
+    // modules loaded earlier so parse_args can use it
     cout << "[*] Loaded " << mods.size() << " modules" << endl;
 
     // help
