@@ -8,6 +8,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <cmath>
 #include <ctype.h>
 
 using namespace std;
@@ -22,6 +23,7 @@ using namespace std;
 /* define inclusions of modules here */
 #include "attacks/example.h"
 #include "attacks/histogram.h"
+#include "attacks/ngram.h"
 #include "attacks/caesar_attack.h"
 #include "ciphers/caesar.h"
 #include "ciphers/vigenere.h"
