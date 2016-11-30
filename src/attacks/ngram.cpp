@@ -98,7 +98,7 @@ int Ngram::process_input(ifstream* in, vector< int >* charCounts, const int nSiz
 			return 4;
 		}
 
-		charBuffer[bufferIndex] = inChar;
+		charBuffer[bufferIndex] = charIndex;
 		int arrayIndex = 0;
 		for (int i = 0; i < nSize; i++) {
 			arrayIndex += charBuffer[(bufferIndex + (i + 1)) % nSize] * pow(charSetSize, nSize - (i + 1));
