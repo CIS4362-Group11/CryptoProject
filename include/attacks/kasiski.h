@@ -1,12 +1,9 @@
-#ifndef EXAMPLE_H
-#define EXAMPLE_H
+#ifndef KASISKI_H
+#define KASISKI_H
 
-class Example : public Module {
+class Kasiski : public Module {
     public:
-        Example();
-
-        // here is a helper func that I will use
-        void test();
+        Kasiski();
 
         // here are the funcs I need to override
         void disp_desc();
