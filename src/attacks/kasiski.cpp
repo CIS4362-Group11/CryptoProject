@@ -96,7 +96,7 @@ void Kasiski::attack()
 
     map<int,int> factors;
     for (unsigned int i = 0; i < candidates.size(); i++) {
-        for (int j = 3; j <= candidates[i]; j++) {
+        for (int j = 4; j <= candidates[i]; j++) {
             if (candidates[i] % j == 0) {
                 auto it = factors.find(j);
                 if (it != factors.end())
@@ -114,7 +114,7 @@ void Kasiski::attack()
         lengths_to_try[i] = it->first;
     for (unsigned int i = 0; i < factors.size(); i++) {
         int j = i;
-        while (j > 0 && factors[lengths_to_try[j-1]] < factors[lengths_to_try[j]]) {
+        while (j > 0 && factors[lengths_to_try[j-1]] > factors[lengths_to_try[j]]) {
             int temp = lengths_to_try[j-1];
             lengths_to_try[j-1] = lengths_to_try[j];
             lengths_to_try[j] = temp;
@@ -125,5 +125,5 @@ void Kasiski::attack()
     // for (int i = 0; i < lengths_to_try.size(); i++)
     //     cout << lengths_to_try[i] << " " << factors[lengths_to_try[i]] << endl;
 
-    cout << "[*] Most likely key length: " << lengths_to_try[0] << endl;
+    cout << "[*] Most likely key length: " << lengths_to_try[lengths_to_try.size()-1] << endl;
 }
