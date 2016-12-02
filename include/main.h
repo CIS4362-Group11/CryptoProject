@@ -26,6 +26,7 @@ using namespace std;
 #include "attacks/histogram.h"
 #include "attacks/ngram.h"
 #include "attacks/caesar_attack.h"
+#include "attacks/kasiski.h"
 #include "ciphers/caesar.h"
 #include "ciphers/vigenere.h"
 
