@@ -7,10 +7,14 @@ Kasiski::Kasiski()
     vector<string> temp;
     temp.push_back("INPUTFILE");
     temp.push_back("OUTPUTFILE");
+    temp.push_back("ASSUMEYES");
+    temp.push_back("MAXBUFF");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
     set_opt_value("OUTPUTFILE", "/tmp/kasiskiresults.txt");
+    set_opt_value("ASSUMEYES", "0");
+    set_opt_value("MAXBUFF", "8192");
 }
 
 /* I am overriding the default module function
@@ -39,25 +43,24 @@ int Kasiski::run()
         return 2;
     }
 
-    ifstream in;
-    ofstream out;
-    string buff;
-
-    cout << "[*] Opening file: " << options["INPUTFILE"] << endl;
-    in.open(options["INPUTFILE"]);
-
-    cout << "[*] Opening file: " << options["OUTPUTFILE"] << endl;
-    out.open(options["OUTPUTFILE"]);
-
-    cout << "[*] Writing..." << endl;
-    while (!in.eof()) {
-        getline(in, buff);
-        out << buff << endl;
+    if (options["ASSUMEYES"].empty() || stoi(options["ASSUMEYES"]) < 0 || stoi(options["ASSUMEYES"]) > 1) {
+        cout << "[-] Please specify an ASSUMEYES value of 0 or 1" << endl;
+        return 3;
     }
 
-    cout << "[*] Closing files" << endl;
-    in.close();
-    out.close();
+    if (options["MAXBUFF"].empty() || stoi(options["MAXBUFF"]) <= 0) {
+        cout << "[-] Option MAXBUFF must be greater than 0" << endl;
+        return 4;
+    }
+
+    cout << "[*] Beginning attack..." << endl;
+    begin_attack();
 
     return 0;
+}
+
+/* implements the kasiski attack */
+void Kasiski::begin_attack()
+{
+
 }
