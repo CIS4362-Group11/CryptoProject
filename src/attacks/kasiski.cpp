@@ -54,13 +54,76 @@ int Kasiski::run()
     }
 
     cout << "[*] Beginning attack..." << endl;
-    begin_attack();
+    attack();
 
     return 0;
 }
 
 /* implements the kasiski attack */
-void Kasiski::begin_attack()
+void Kasiski::attack()
 {
+    string buff, test;
+    ifstream in;
+    unsigned int max = stoi(options["MAXBUFF"]);
 
+    cout << "[*] Opening input file: " << options["INPUTFILE"] << endl;
+    in.open(options["INPUTFILE"]);
+
+    while (getline(in, buff)) {
+        for (unsigned int i = 0; i < buff.size(); i++)
+            if (isalpha(buff[i]) && test.size() < max)
+                test += tolower(buff[i]);
+            else if (test.size() >= max)
+                break;
+        if (test.size() >= max)
+            break;
+    }
+
+    // cout << test << endl;
+
+    if (test.size() < max)
+        cout << "[-] WARNING: Kasiski attack buffer not full" << endl;
+
+    cout << "[*] Finding possible key lengths..." << endl;
+    vector<int> candidates;
+    for (unsigned int i = 0; i < (test.size()-2); i++) {
+        string pattern = test.substr(i, 3);
+        size_t found = test.find(pattern, i+1);
+        if (found != string::npos)
+            if (find(candidates.begin(), candidates.end(), found-i) == candidates.end())
+                candidates.push_back(found-i);
+    }
+
+    map<int,int> factors;
+    for (unsigned int i = 0; i < candidates.size(); i++) {
+        for (int j = 3; j <= candidates[i]; j++) {
+            if (candidates[i] % j == 0) {
+                auto it = factors.find(j);
+                if (it != factors.end())
+                    factors[j]++;
+                else
+                    factors[j] = 1;
+            }
+        }
+    }
+
+    /* insertion sort */
+    vector<int> lengths_to_try(factors.size());
+    int i = 0;
+    for (auto it = factors.begin(); it != factors.end(); it++, i++)
+        lengths_to_try[i] = it->first;
+    for (unsigned int i = 0; i < factors.size(); i++) {
+        int j = i;
+        while (j > 0 && factors[lengths_to_try[j-1]] < factors[lengths_to_try[j]]) {
+            int temp = lengths_to_try[j-1];
+            lengths_to_try[j-1] = lengths_to_try[j];
+            lengths_to_try[j] = temp;
+            j--;
+        }
+    }
+
+    // for (int i = 0; i < lengths_to_try.size(); i++)
+    //     cout << lengths_to_try[i] << " " << factors[lengths_to_try[i]] << endl;
+
+    cout << "[*] Most likely key length: " << lengths_to_try[0] << endl;
 }

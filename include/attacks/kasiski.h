@@ -10,7 +10,7 @@ class Kasiski : public Module {
         int run();
 
     private:
-        void begin_attack();
+        void attack();
 };
 
 #endif
