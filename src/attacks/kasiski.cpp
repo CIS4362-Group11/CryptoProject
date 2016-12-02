@@ -11,12 +11,14 @@ Kasiski::Kasiski()
     temp.push_back("OUTPUTFILE");
     temp.push_back("ASSUMEZERO");
     temp.push_back("MAXBUFF");
+    temp.push_back("NUMKEYS");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
     set_opt_value("OUTPUTFILE", "/tmp/kasiskiresults.txt");
     set_opt_value("ASSUMEZERO", "0");
     set_opt_value("MAXBUFF", "8192");
+    set_opt_value("NUMKEYS", "10");
 }
 
 /* I am overriding the default module function
@@ -27,6 +29,11 @@ void Kasiski::disp_desc()
     cout << "Module: attacks/kasiski\n\tAttempts to decrypt a ciphertext sample encrypted with\n\tthe repeated key Vigenere cipher.\n\tWill return the decrypted file and key if successful.\n\tPlease define INPUTFILE for this example module to run correctly.\n\tOptions are given below:\n" << endl;
     disp_opts();
     cout << endl;
+}
+
+bool is_number(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
 /* overrides the virtual function from Module
@@ -45,25 +52,25 @@ int Kasiski::run()
         return 2;
     }
 
-    if (options["ASSUMEZERO"].empty() || stoi(options["ASSUMEZERO"]) < 0 || stoi(options["ASSUMEZERO"]) > 1) {
+    if (options["ASSUMEZERO"].empty() || !is_number(options["ASSUMEZERO"]) || stoi(options["ASSUMEZERO"]) < 0 || stoi(options["ASSUMEZERO"]) > 1) {
         cout << "[-] Please specify an ASSUMEZERO value of 0 or 1" << endl;
         return 3;
     }
 
-    if (options["MAXBUFF"].empty() || stoi(options["MAXBUFF"]) <= 0) {
+    if (options["MAXBUFF"].empty() || !is_number(options["MAXBUFF"]) || stoi(options["MAXBUFF"]) <= 0) {
         cout << "[-] Option MAXBUFF must be greater than 0" << endl;
         return 4;
+    }
+
+    if (options["NUMKEYS"].empty() || !is_number(options["NUMKEYS"]) || stoi(options["NUMKEYS"]) <= 0) {
+        cout << "[-] Option NUMKEYS must be greater than 0" << endl;
+        return 5;
     }
 
     cout << "[*] Beginning attack..." << endl;
     attack();
 
     return 0;
-}
-
-bool is_number(const std::string& s)
-{
-    return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
 /* implements the kasiski attack */
@@ -143,9 +150,12 @@ void Kasiski::attack()
 
     cout << "[*] Finding possible keys... " << endl;
 
-    vector<vector<int>> possible_keys(10);
-    float key_chi[10] = {0};
-    for (int i = 0; i < 10; i++) {
+    int numkeys = stoi(options["NUMKEYS"]);
+    vector<vector<int>> possible_keys(numkeys);
+    float *key_chi = new float[numkeys];
+    for (int i = 0; i < numkeys; i++)
+        key_chi[i] = 0;
+    for (int i = 0; i < numkeys; i++) {
         possible_keys[i] = find_key(test, lengths_to_try[i]);
 
         unsigned int keyi = 0;
@@ -162,10 +172,10 @@ void Kasiski::attack()
         // cout << key_str(possible_keys[i]) << "\t" << key_chi[i] << "\t" << buff.substr(0,70) << endl;
     }
 
-    int mins[10] = {0};
-    for (int i = 0; i < 10; i++)
+    int *mins = new int[numkeys];
+    for (int i = 0; i < numkeys; i++)
         mins[i] = i;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < numkeys; i++) {
         int j = i;
         while (j > 0 && key_chi[mins[j-1]] > key_chi[mins[j]]) {
             int temp = mins[j-1];
@@ -176,7 +186,7 @@ void Kasiski::attack()
     }
 
     cout << "[+] Possible keys (sorted by probability):" << endl;
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < numkeys; i++)
         cout << "\t[" << i << "] " << key_str(possible_keys[mins[i]]) << endl;
 
     int choice = -1;
@@ -184,7 +194,7 @@ void Kasiski::attack()
         cout << "[*] Assuming zero" << endl;
         choice = 0;
     } else {
-        while (choice < 0 || choice >= 10) {
+        while (choice < 0 || choice >= numkeys) {
             cout << "[*] Select key for decryption: ";
             getline(cin, buff);
             if (!is_number(buff)) continue;
@@ -208,6 +218,9 @@ void Kasiski::attack()
     cout << "[*] Closing files" << endl;
     in.close();
     out.close();
+
+    delete[] key_chi;
+    delete[] mins;
 }
 
 string Kasiski::key_str(vector<int> &key)
