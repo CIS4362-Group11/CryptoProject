@@ -175,9 +175,10 @@ void Kasiski::attack()
         cout << "\t[" << i << "] " << key_str(possible_keys[mins[i]]) << endl;
 
     int choice = -1;
-    if (stoi(options["ASSUMEZERO"]))
+    if (stoi(options["ASSUMEZERO"])) {
+        cout << "[*] Assuming zero" << endl;
         choice = 0;
-    else {
+    } else {
         while (choice < 0 || choice >= 10) {
             cout << "[*] Select key for decryption: ";
             getline(cin, buff);
