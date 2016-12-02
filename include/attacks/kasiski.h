@@ -10,7 +10,9 @@ class Kasiski : public Module {
         int run();
 
     private:
-        string find_key(string&, int);
+        static float english[];
+        vector<int> find_key(string&, int);
+        string key_str(vector<int>&);
         void attack();
 };
 

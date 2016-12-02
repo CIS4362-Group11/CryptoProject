@@ -1,5 +1,7 @@
 #include "main.h"
 
+float Kasiski::english[] = {0.0834423, 0.0169666, 0.0191698, 0.0539923, 0.112034, 0.0180501, 0.0246394, 0.0602159, 0.0646833, 0.00280142, 0.0130094, 0.0398317, 0.0236778, 0.0747964, 0.0835958, 0.0138107, 0.000442449, 0.0464413, 0.057629, 0.0967157, 0.0318857, 0.00675638, 0.03031, 0.0011919, 0.0234859, 0.00042439};
+
 /* example constructor, sets some options */
 Kasiski::Kasiski()
 {
@@ -129,15 +131,53 @@ void Kasiski::attack()
         cout << "\t" << lengths_to_try[i] << " " << factors[lengths_to_try[i]] << "\t";
     cout << endl;
 
-    cout << "[*] Most likely key length: " << lengths_to_try[0] << endl;
+    // cout << "[*] Most likely key length: " << lengths_to_try[0] << endl;
 
-    cout << find_key(test, lengths_to_try[0]) << endl;
+    vector<vector<int>> possible_keys(10);
+    float key_chi[10] = {0};
+    for (int i = 0; i < 10; i++) {
+        possible_keys[i] = find_key(test, lengths_to_try[i]);
+
+        unsigned int keyi = 0;
+        Vigenere::encrypt(test, buff, possible_keys[i], keyi, true);
+
+        float freq[26] = {0.0f};
+        for (unsigned int j = 0; j < buff.size(); j++) {
+            int t = ((int) tolower(buff[j])) - 97;
+            freq[t]++;
+        }
+        for (int j = 0; j < 26; j++)
+            freq[j] /= ((float) buff.size());
+        key_chi[i] = chisq(freq, english);
+        // cout << key_str(possible_keys[i]) << "\t" << key_chi[i] << "\t" << buff.substr(0,70) << endl;
+    }
+
+    int mins[10] = {0};
+    for (int i = 0; i < 10; i++)
+        mins[i] = i;
+    for (int i = 0; i < 10; i++) {
+        int j = i;
+        while (j > 0 && key_chi[mins[j-1]] > key_chi[mins[j]]) {
+            int temp = mins[j-1];
+            mins[j-1] = mins[j];
+            mins[j] = temp;
+            j--;
+        }
+    }
+
+    cout << "[*] Most likely key: " << key_str(possible_keys[mins[0]]) << endl;
 }
 
-string Kasiski::find_key(string &buff, int length)
+string Kasiski::key_str(vector<int> &key)
 {
-    float english[] = {0.0834423, 0.0169666, 0.0191698, 0.0539923, 0.112034, 0.0180501, 0.0246394, 0.0602159, 0.0646833, 0.00280142, 0.0130094, 0.0398317, 0.0236778, 0.0747964, 0.0835958, 0.0138107, 0.000442449, 0.0464413, 0.057629, 0.0967157, 0.0318857, 0.00675638, 0.03031, 0.0011919, 0.0234859, 0.00042439};
+    string out = "";
+    for (unsigned int i = 0; i < key.size(); i++)
+        out += ((char) (key[i]+97));
+    return out;
+}
 
+vector<int> Kasiski::find_key(string &buff, int length)
+{
     float *freq = new float[length*26];
 
     for (int i = 0; i < length; i++)
@@ -162,7 +202,7 @@ string Kasiski::find_key(string &buff, int length)
     //     cout << endl;
     // }
 
-    string key = "";
+    vector<int> key;
     for (int i = 0; i < length; i++) {
         float chis[26];
         float *ffreq = &freq[i*26];
@@ -178,7 +218,7 @@ string Kasiski::find_key(string &buff, int length)
             }
         }
 
-        key += ((char) (min+97));
+        key.push_back(min);
     }
 
     delete[] freq;
