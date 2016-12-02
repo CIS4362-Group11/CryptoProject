@@ -76,6 +76,11 @@ void Kasiski::attack()
     cout << "[*] Opening input file: " << options["INPUTFILE"] << endl;
     in.open(options["INPUTFILE"]);
 
+    if (!in.good()) {
+        cout << "[-] Input file error" << endl;
+        return;
+    }
+
     while (getline(in, buff)) {
         for (unsigned int i = 0; i < buff.size(); i++)
             if (isalpha(buff[i]) && test.size() < max)
