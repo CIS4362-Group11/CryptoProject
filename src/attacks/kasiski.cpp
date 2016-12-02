@@ -9,13 +9,13 @@ Kasiski::Kasiski()
     vector<string> temp;
     temp.push_back("INPUTFILE");
     temp.push_back("OUTPUTFILE");
-    temp.push_back("ASSUMEYES");
+    temp.push_back("ASSUMEZERO");
     temp.push_back("MAXBUFF");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
     set_opt_value("OUTPUTFILE", "/tmp/kasiskiresults.txt");
-    set_opt_value("ASSUMEYES", "0");
+    set_opt_value("ASSUMEZERO", "0");
     set_opt_value("MAXBUFF", "8192");
 }
 
@@ -45,8 +45,8 @@ int Kasiski::run()
         return 2;
     }
 
-    if (options["ASSUMEYES"].empty() || stoi(options["ASSUMEYES"]) < 0 || stoi(options["ASSUMEYES"]) > 1) {
-        cout << "[-] Please specify an ASSUMEYES value of 0 or 1" << endl;
+    if (options["ASSUMEZERO"].empty() || stoi(options["ASSUMEZERO"]) < 0 || stoi(options["ASSUMEZERO"]) > 1) {
+        cout << "[-] Please specify an ASSUMEZERO value of 0 or 1" << endl;
         return 3;
     }
 
@@ -59,6 +59,11 @@ int Kasiski::run()
     attack();
 
     return 0;
+}
+
+bool is_number(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
 /* implements the kasiski attack */
@@ -131,7 +136,7 @@ void Kasiski::attack()
         cout << "\t" << lengths_to_try[i] << " " << factors[lengths_to_try[i]] << "\t";
     cout << endl;
 
-    // cout << "[*] Most likely key length: " << lengths_to_try[0] << endl;
+    cout << "[*] Finding possible keys... " << endl;
 
     vector<vector<int>> possible_keys(10);
     float key_chi[10] = {0};
@@ -165,7 +170,23 @@ void Kasiski::attack()
         }
     }
 
-    cout << "[*] Most likely key: " << key_str(possible_keys[mins[0]]) << endl;
+    cout << "[+] Possible keys (sorted by probability):" << endl;
+    for (int i = 0; i < 10; i++)
+        cout << "\t[" << i << "] " << key_str(possible_keys[mins[i]]) << endl;
+
+    int choice = -1;
+    if (stoi(options["ASSUMEZERO"]))
+        choice = 0;
+    else {
+        while (choice < 0 || choice >= 10) {
+            cout << "[*] Select key for decryption: ";
+            getline(cin, buff);
+            if (!is_number(buff)) continue;
+            choice = stoi(buff);
+        }
+    }
+
+    while (getline(in, buff));
 }
 
 string Kasiski::key_str(vector<int> &key)
