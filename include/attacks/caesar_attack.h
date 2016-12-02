@@ -1,6 +1,9 @@
 #ifndef CAESAR_ATTACK_H
 #define CAESAR_ATTACK_H
 
+float chisq(float*, float*);
+void left_shift_freq(float*);
+
 class CaesarAttack : public Module {
     public:
         CaesarAttack();
@@ -9,8 +12,7 @@ class CaesarAttack : public Module {
         void disp_desc();
         int run();
 
-    private:
-        void begin_attack(ifstream&, ofstream&);
+        static void begin_attack(ifstream&, ofstream&, string&, int);
 };
 
 #endif

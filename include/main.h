@@ -11,6 +11,8 @@
 #include <cmath>
 #include <ctype.h>
 #include <string.h>
+#include <cstdio>
+#include <algorithm>
 
 using namespace std;
 
@@ -26,6 +28,7 @@ using namespace std;
 #include "attacks/histogram.h"
 #include "attacks/ngram.h"
 #include "attacks/caesar_attack.h"
+#include "attacks/kasiski.h"
 #include "ciphers/caesar.h"
 #include "ciphers/vigenere.h"
 
