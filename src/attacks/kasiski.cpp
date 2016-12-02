@@ -186,7 +186,22 @@ void Kasiski::attack()
         }
     }
 
-    while (getline(in, buff));
+    ofstream out;
+    cout << "[*] Opening output file: " << options["OUTPUTFILE"] << endl;
+    out.open(options["OUTPUTFILE"]);
+
+    in.clear();
+    in.seekg(0);
+    string obuff;
+    unsigned int key_index = 0;
+    while (getline(in, buff)) {
+        Vigenere::encrypt(buff, obuff, possible_keys[mins[choice]], key_index, true);
+        out << obuff << endl;
+    }
+
+    cout << "[*] Closing files" << endl;
+    in.close();
+    out.close();
 }
 
 string Kasiski::key_str(vector<int> &key)
