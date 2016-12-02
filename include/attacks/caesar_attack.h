@@ -9,8 +9,7 @@ class CaesarAttack : public Module {
         void disp_desc();
         int run();
 
-    private:
-        void begin_attack(ifstream&, ofstream&);
+        static void begin_attack(ifstream&, ofstream&, string&, int);
 };
 
 #endif

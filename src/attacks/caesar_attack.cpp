@@ -53,7 +53,7 @@ int CaesarAttack::run()
     in.open(options["INPUTFILE"]);
 
     cout << "[*] Beginning attack..." << endl;
-    begin_attack(in, out);
+    begin_attack(in, out, options["OUTPUTFILE"], stoi(options["ASSUMEYES"]));
 
     cout << "[*] Closing files" << endl;
     in.close();
@@ -83,7 +83,7 @@ void left_shift_freq(float *freq)
 }
 
 /* handles the main attack sequence */
-void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
+void CaesarAttack::begin_attack(ifstream &in, ofstream &out, string &outfname, int assumeyes)
 {
     /* from analyzing huckleberry finn */
     float english[] = {0.0834423, 0.0169666, 0.0191698, 0.0539923, 0.112034, 0.0180501, 0.0246394, 0.0602159, 0.0646833, 0.00280142, 0.0130094, 0.0398317, 0.0236778, 0.0747964, 0.0835958, 0.0138107, 0.000442449, 0.0464413, 0.057629, 0.0967157, 0.0318857, 0.00675638, 0.03031, 0.0011919, 0.0234859, 0.00042439};
@@ -127,7 +127,7 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
     for (int i = 0; i < 26; i++) {
         cout << "[*] Decrypting file with shift " << mins[i] << " (chi^2 = " << csq[mins[i]] << ")..." << endl;
 
-        out.open(options["OUTPUTFILE"]);
+        out.open(outfname);
 
         // reset input
         in.clear();
@@ -147,7 +147,7 @@ void CaesarAttack::begin_attack(ifstream &in, ofstream &out)
             }
         }
 
-        if (!stoi(options["ASSUMEYES"])) {
+        if (!assumeyes) {
             string ans;
             cout << "[*] Continue decryption? [Y/n]: ";
             getline(cin, ans);
