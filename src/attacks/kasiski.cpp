@@ -96,7 +96,7 @@ void Kasiski::attack()
 
     map<int,int> factors;
     for (unsigned int i = 0; i < candidates.size(); i++) {
-        for (int j = 4; j <= candidates[i]; j++) {
+        for (int j = 3; j <= candidates[i]; j++) {
             if (candidates[i] % j == 0) {
                 auto it = factors.find(j);
                 if (it != factors.end())
@@ -114,7 +114,7 @@ void Kasiski::attack()
         lengths_to_try[i] = it->first;
     for (unsigned int i = 0; i < factors.size(); i++) {
         int j = i;
-        while (j > 0 && factors[lengths_to_try[j-1]] > factors[lengths_to_try[j]]) {
+        while (j > 0 && factors[lengths_to_try[j-1]] < factors[lengths_to_try[j]]) {
             int temp = lengths_to_try[j-1];
             lengths_to_try[j-1] = lengths_to_try[j];
             lengths_to_try[j] = temp;
@@ -122,8 +122,65 @@ void Kasiski::attack()
         }
     }
 
-    // for (int i = 0; i < lengths_to_try.size(); i++)
-    //     cout << lengths_to_try[i] << " " << factors[lengths_to_try[i]] << endl;
+    for (int i = 0; i < 5; i++)
+        cout << "\t" << lengths_to_try[i] << " " << factors[lengths_to_try[i]] << "\t";
+    cout << endl;
+    for (int i = 5; i < 10; i++)
+        cout << "\t" << lengths_to_try[i] << " " << factors[lengths_to_try[i]] << "\t";
+    cout << endl;
 
-    cout << "[*] Most likely key length: " << lengths_to_try[lengths_to_try.size()-1] << endl;
+    cout << "[*] Most likely key length: " << lengths_to_try[0] << endl;
+
+    cout << find_key(test, lengths_to_try[0]) << endl;
+}
+
+string Kasiski::find_key(string &buff, int length)
+{
+    float english[] = {0.0834423, 0.0169666, 0.0191698, 0.0539923, 0.112034, 0.0180501, 0.0246394, 0.0602159, 0.0646833, 0.00280142, 0.0130094, 0.0398317, 0.0236778, 0.0747964, 0.0835958, 0.0138107, 0.000442449, 0.0464413, 0.057629, 0.0967157, 0.0318857, 0.00675638, 0.03031, 0.0011919, 0.0234859, 0.00042439};
+
+    float *freq = new float[length*26];
+
+    for (int i = 0; i < length; i++)
+        for (int j = 0; j < 26; j++)
+            freq[i*26 + j] = 0;
+
+    int pos = 0;
+    for (unsigned int i = 0; i < buff.size(); i++) {
+        int t = ((int) tolower(buff[i])) - 97;
+        freq[pos*26 + t]++;
+        if ((++pos) >= length)
+            pos = 0;
+    }
+
+    for (int i = 0; i < length; i++)
+        for (int j = 0; j < 26; j++)
+            freq[i*26 + j] /= ((float)buff.size()/(float)length);
+
+    // for (int i = 0; i < length; i++) {
+    //     for (int j = 0; j < 26; j++)
+    //         cout << freq[i*26 + j] << " ";
+    //     cout << endl;
+    // }
+
+    string key = "";
+    for (int i = 0; i < length; i++) {
+        float chis[26];
+        float *ffreq = &freq[i*26];
+        for (int j = 0; j < 26; j++) {
+            chis[j] = chisq(ffreq, english);
+            left_shift_freq(ffreq);
+        }
+
+        int min = 0; float val = chis[min];
+        for (int x = 1; x < 26; x++) {
+            if (chis[x] < val) {
+                min = x; val = chis[min];
+            }
+        }
+
+        key += ((char) (min+97));
+    }
+
+    delete[] freq;
+    return key;
 }

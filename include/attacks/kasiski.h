@@ -10,6 +10,7 @@ class Kasiski : public Module {
         int run();
 
     private:
+        string find_key(string&, int);
         void attack();
 };
 
