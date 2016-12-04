@@ -31,5 +31,6 @@ using namespace std;
 #include "attacks/kasiski.h"
 #include "ciphers/caesar.h"
 #include "ciphers/vigenere.h"
+#include "ciphers/hill.h"
 
 #endif
