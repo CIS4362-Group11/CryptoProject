@@ -4,7 +4,7 @@ SD=src/
 ID=include/
 BD=build/
 ATTACKS=example.o histogram.o caesar_attack.o ngram.o kasiski.o
-CIPHERS=caesar.o vigenere.o hill.o
+CIPHERS=caesar.o vigenere.o hill.o rail.o
 VER=0.1
 TARG=cryptoproject
 
@@ -41,6 +41,9 @@ kasiski.o: bd $(SD)attacks/kasiski.cpp $(ID)attacks/kasiski.h
 	
 hill.o: bd $(SD)ciphers/hill.cpp $(ID)ciphers/hill.h
 	$(CC) $(CFLAGS) -c $(SD)ciphers/hill.cpp -o $(BD)hill.o
+	
+rail.o: bd $(SD)ciphers/rail.cpp $(ID)ciphers/rail.h
+	$(CC) $(CFLAGS) -c $(SD)ciphers/rail.cpp -o $(BD)rail.o
 
 $(TARG): main.o module.o $(ATTACKS) $(CIPHERS) $(TOOLS)
 	$(CC) $(CFLAGS) $(BD)main.o $(BD)module.o $(addprefix $(BD), $(ATTACKS)) $(addprefix $(BD), $(CIPHERS)) -o $(TARG)
