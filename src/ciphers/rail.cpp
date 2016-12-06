@@ -94,6 +94,7 @@ void Rail::encrypt(ifstream* in, ostream* out, int numRails)
 	bool ascend = true;
 	while (in->get(inChar)) {
 		rails[currRail].push_back(inChar);
+		cout << inChar << " " << currRail << ", " << rails[currRail].end() - rails[currRail].begin() - 1 << endl;
 		if (ascend) { 
 			currRail++;
 			if (currRail == numRails-1)
@@ -108,7 +109,7 @@ void Rail::encrypt(ifstream* in, ostream* out, int numRails)
 
 	//Just pad for easier decryption honestly
 	if (!ascend) {
-		while (currRail >= 0) {
+		while (currRail > 0) {
 			rails[currRail].push_back('\n');
 			if (currRail > 0) currRail--;
 		}
@@ -168,10 +169,10 @@ void Rail::decrypt(ifstream* in, ostream* out, int numRails)
 
 	while (edgeIndex < numOnEdges) {
 		if (railIndex == 0 || railIndex == numRails - 1) {
-			(*out) << rails[railIndex][edgeIndex];
+			(*out) << rails[edgeIndex][railIndex];
 		}
 		else {
-			(*out) << rails[railIndex][middleIndex];
+			(*out) << rails[middleIndex][railIndex];
 		}
 
 		if (ascend) {
