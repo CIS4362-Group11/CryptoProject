@@ -14,6 +14,7 @@ void register_modules(map<string,Module*> &m)
 	m.insert(make_pair("attacks/ngram", new Ngram()));
     m.insert(make_pair("attacks/caesar", new CaesarAttack()));
     m.insert(make_pair("attacks/kasiski", new Kasiski()));
+    m.insert(make_pair("attacks/hillatt", new HillAtt()));
     m.insert(make_pair("ciphers/caesar", new Caesar()));
     m.insert(make_pair("ciphers/vigenere", new Vigenere()));
     m.insert(make_pair("ciphers/hill", new Hill()));

@@ -85,7 +85,7 @@ int HillAtt::run()
     out.open(options["OUTPUTFILE"]);
 	
 	cout << "Attacking hill cipher!" << endl;
-	int rows = stoi(options["MATRIX_ROWS"]);
+	//int rows = stoi(options["MATRIX_ROWS"]);
 	int columns = stoi(options["MATRIX_COLUMNS"]);
 	vector < vector<int>> vec;
 	if(attack(tkey,ckey, vec)==9)
