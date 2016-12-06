@@ -18,6 +18,7 @@ Hill::Hill()
     // set default values, option must exist or error will printed
     set_opt_value("OUTPUTFILE", "encrypted.txt");
 	set_opt_value("DECRYPT", "0");
+	
 
 }
 
@@ -120,6 +121,19 @@ int Hill::run()
 		}
 		vec.push_back(row);
 	}
+			MatrixXf a(vec[0].size(),vec.size());
+			for(unsigned int r = 0 ; r < vec.size();r++)
+			{
+				for(unsigned int c = 0; c <vec[0].size();c++)
+				{
+					a(r,c) = vec[r][c];
+				}
+			}
+			int y = a.determinant();
+			if(y == 0)
+			{
+				cout << "The key is not invertible, can encrypt, but can't decrypt." << endl;
+			}
 	
 	string passbuff = "";
 	while (getline(in, ibuff)) {
@@ -200,6 +214,11 @@ void Hill::encrypt(string& in, string& out , vector <vector<int>> &vec, bool dec
 				}
 			}
 			int y = a.determinant();
+			if(y == 0)
+			{
+				cout << "The key is not invertible, can't decrypt" << endl;
+				return;
+			}
 			a= a.inverse();
 			int m = 26;
 			int z =y;

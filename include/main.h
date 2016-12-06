@@ -29,6 +29,7 @@ using namespace std;
 #include "attacks/ngram.h"
 #include "attacks/caesar_attack.h"
 #include "attacks/kasiski.h"
+#include "attacks/hillatt.h"
 #include "ciphers/caesar.h"
 #include "ciphers/vigenere.h"
 #include "ciphers/hill.h"
