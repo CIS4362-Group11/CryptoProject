@@ -15,8 +15,6 @@ Rail::Rail()
     set_opt_value("OUTPUTFILE", "encr_rail.txt");
     set_opt_value("DECRYPT", "0");
 	set_opt_value("NUMRAILS", "5");
-	// delete before merge
-	set_opt_value("INPUTFILE", "makefile");
 }
 
 /* I am overriding the default module function
