@@ -94,7 +94,6 @@ void Rail::encrypt(ifstream* in, ostream* out, int numRails)
 	bool ascend = true;
 	while (in->get(inChar)) {
 		rails[currRail].push_back(inChar);
-		cout << inChar << " " << currRail << ", " << rails[currRail].end() - rails[currRail].begin() - 1 << endl;
 		if (ascend) { 
 			currRail++;
 			if (currRail == numRails-1)
