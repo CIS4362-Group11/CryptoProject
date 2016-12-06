@@ -33,5 +33,6 @@ using namespace std;
 #include "ciphers/caesar.h"
 #include "ciphers/vigenere.h"
 #include "ciphers/hill.h"
+#include "ciphers/rail.h"
 
 #endif

@@ -18,6 +18,7 @@ void register_modules(map<string,Module*> &m)
     m.insert(make_pair("ciphers/caesar", new Caesar()));
     m.insert(make_pair("ciphers/vigenere", new Vigenere()));
     m.insert(make_pair("ciphers/hill", new Hill()));
+	m.insert(make_pair("ciphers/rail", new Rail()));
 }
 
 /* helper function to split strings */
