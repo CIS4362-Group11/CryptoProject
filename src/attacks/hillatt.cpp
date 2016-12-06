@@ -1,23 +1,27 @@
 #include "main.h"
-#include "Eigen/Dense"
+#include "../ciphers/Eigen/Dense"
 
 using namespace Eigen;
 /* example constructor, sets some options */
-Hill::Hill()
+HillAtt::HillAtt()
 {
     // declare options, keep options as uppercase
     vector<string> temp;
     temp.push_back("INPUTFILE");
     temp.push_back("OUTPUTFILE");
-	temp.push_back("KEY");
-	temp.push_back("DECRYPT");
+	temp.push_back("PLAINTEXT");
+	temp.push_back("CIPHERTEXT");
 	temp.push_back("MATRIX_ROWS");
 	temp.push_back("MATRIX_COLUMNS");
     set_opts(temp);
 
     // set default values, option must exist or error will printed
-    set_opt_value("OUTPUTFILE", "encrypted.txt");
-	set_opt_value("DECRYPT", "0");
+    set_opt_value("OUTPUTFILE", "broken.txt");
+    set_opt_value("INPUTFILE", "encrypted.txt");
+	set_opt_value("MATRIX_ROWS", "2");
+	set_opt_value("MATRIX_COLUMNS", "2");
+	set_opt_value("PLAINTEXT", "upto");
+	set_opt_value("CIPHERTEXT", "RERZ");
 	
 
 }
@@ -25,9 +29,9 @@ Hill::Hill()
 /* I am overriding the default module function
  * for displaying the description text
  */
-void Hill::disp_desc()
+void HillAtt::disp_desc()
 {
-    cout << "Module: ciphers/Hill\n\tEncrypts (or decrypts) a text file with the hill cipher.\n\tInput text should be lowercase, symbols are ignored.\n\tCipher text is all uppercase.\n\tPlease define the following required options:\n\t\tINPUTFILE\tinput filename\n\t\tKEY\t\tlowercase string key" << endl;
+    cout << "Module: attacks/HillAtt\n\tUses known plaintext and cipher text to try to crack the key. \n\tBoth the plaintext must be invertible and have a modulus of 26,\n\t all of this is checked in the program.\n\tInput text should be lowercase, symbols are ignored.\n\tCipher text is all uppercase.\n\tPlease define the following required options:\n\t\tPLAINTEXT\tfound in original file\n\t\tCIPHERTEXT\tuppercase corresponds to plaintext" << endl;
    // disp_opts();
     cout << endl;
 }
@@ -35,12 +39,11 @@ void Hill::disp_desc()
 /* overrides the virtual function from Module
  * this is where the real meaty stuff happens
  */
-int Hill::run()
+int HillAtt::run()
 {
 	ifstream in;
     ofstream out;
     string ibuff, obuff;
-    bool decrypt = false;
 
     // perform error checking on options first
     if (options["INPUTFILE"].empty()) {
@@ -53,20 +56,17 @@ int Hill::run()
         return 2;
     }
 
-    if (options["KEY"].empty()) {
-        cout << "[-] Please specify a key" << endl;
+    if (options["PLAINTEXT"].empty()) {
+        cout << "[-] Please specify known plaintext" << endl;
         return 3;
     }
-    string tkey = options["KEY"];
-
-    if (options["DECRYPT"] == "1")
-        decrypt = true;
-    else if (options["DECRYPT"] == "0")
-        decrypt = false;
-    else {
-        cout << "[-] Invalid DECRYPT value (must be 0 or 1)" << endl;
+	string tkey = options["PLAINTEXT"]; 
+	if (options["CIPHERTEXT"].empty()) {
+        cout << "[-] Please specify corresponding ciphertext" << endl;
         return 4;
     }
+	string ckey = options["CIPHERTEXT"];
+    
 	
 	if(options["MATRIX_ROWS"].empty() || options["MATRIX_COLUMNS"].empty())
 	{
@@ -84,61 +84,30 @@ int Hill::run()
     cout << "[*] Opening output file: " << options["OUTPUTFILE"] << endl;
     out.open(options["OUTPUTFILE"]);
 	
-	if (!decrypt) cout << "[*] Encrypting..." << endl;
-    else cout << "[*] Decrypting..." << endl;
-	int rows = stoi(options["MATRIX_ROWS"]);
+	cout << "Attacking hill cipher!" << endl;
+	//int rows = stoi(options["MATRIX_ROWS"]);
 	int columns = stoi(options["MATRIX_COLUMNS"]);
-	vector< vector<int> > vec;
-
-	int keytrack = 0;
-	int tksize = tkey.size();
-	for(int i = 0;i < rows;i++)
-	{	
-		vector<int> row;//putting into the row
-		for(int j = 0;j < columns;j++)
-		{
-			if(tksize <=0)
-			{
-				row.push_back(abs(tksize));
-				tksize--;
-				if(tksize%26==0)
-				{
-					tksize = 0;
-				}
-			
-			}
-			else if (isalpha(tkey[keytrack]))
-			{
-					row.push_back( ((int) tolower(tkey[keytrack])) - 97 );
-					tksize--;
-					keytrack++;
-			}
-			else
-			{
-				cout << "[-] Invalid key" << endl;
-				return 7;
-			}	
-		}
-		vec.push_back(row);
+	vector < vector<int>> vec;
+	if(attack(tkey,ckey, vec)==9)
+	{
+		return 9;
 	}
-			MatrixXf a(vec[0].size(),vec.size());
+
+			/*MatrixXf a(vec[0].size(),vec.size());
 			for(unsigned int r = 0 ; r < vec.size();r++)
 			{
 				for(unsigned int c = 0; c <vec[0].size();c++)
 				{
 					a(r,c) = vec[r][c];
 				}
-			}
-			int y = a.determinant();
-			if(y == 0)
-			{
-				cout << "The key is not invertible, can encrypt, but can't decrypt." << endl;
-			}
+			}*/
+			
 	
 	string passbuff = "";
 	while (getline(in, ibuff)) {
 		passbuff += ibuff;
-        encrypt(passbuff, obuff, vec, decrypt);
+		decrypt(passbuff,obuff,vec);
+       // encrypt(passbuff, obuff, vec, decrypt);
 		out << obuff << endl;
     }
 	if(passbuff.length() > 0)//add random character if not a multiple
@@ -147,18 +116,18 @@ int Hill::run()
 		{
 			passbuff+="x";
 		}
-		encrypt(passbuff, obuff, vec, decrypt);
+		//encrypt(passbuff, obuff, vec);
 		out << obuff << endl;
 	}
 	cout << endl;
-	for(unsigned int i = 0;i< vec.size();i++)
+	/*for(unsigned int i = 0;i< vec.size();i++)
 	{
 		for(unsigned int j = 0;j < vec[i].size();j++)
 		{
 			cout << vec[i][j] << " ";
 		}
 		cout << endl;
-	}
+	}*/
     in.close();
     out.close();
 	return 0;
@@ -170,42 +139,97 @@ int Hill::run()
  * input string must be lowercase
  * output string will be uppercase
  */
-void Hill::encrypt(string& in, string& out , vector <vector<int>> &vec, bool decrypt)
+ int HillAtt::attack(string& ptext, string&ctext, vector <vector<int>> &vec)
+ {
+	MatrixXf a(2,2);
+	MatrixXf k(2,2);
+	a(0,0) = ptext[0]-97;
+	a(1,0) = ptext[1]-97;
+	a(0,1) = ptext[2]-97;
+	a(1,1) = ptext[3]-97;
+	
+	
+	k(0,0) = tolower(ctext[0])-97;
+	k(1,0) = tolower(ctext[1])-97;
+	k(0,1) = tolower(ctext[2])-97;
+	k(1,1) = tolower(ctext[3])-97;
+	int y = rint(a.determinant());
+	if(y==0)
+	{
+		cout << "Plaintext provided not invertible" << endl;
+		return 9;
+	}
+	a = a.inverse();
+	int z =y;
+	int m = 26;
+	y = fmod(y,m);
+	if(y < 0)
+	{
+		y = y+m;
+	}
+	int x;
+	int inv = 1;
+	for(x = 1; x < m; x++) {
+		if(fmod((y*x),m) == 1)
+		{
+			inv = 0;
+			break;
+		}
+	}
+	if(inv ==1)
+	{
+		cout << "could not apply modulus 26" << endl;
+		return 9;
+	}
+	for(int i = 0; i < a.rows(); i++)
+	{
+		for(int j = 0; j <a.cols();j++)
+		{
+			int m=26;
+			a(i,j) = a(i,j)*z;
+			a(i,j) *=x;
+			int temp = fmod(a(i,j),m);
+			if(temp < 0)
+			{
+				temp = temp+m;
+			}
+			a(i,j) = temp;
+		}
+	}
+	k = k*a;
+	for(int i = 0; i < k.rows(); i++)
+	{
+		vector<int> row;
+		for(int j = 0; j <k.cols();j++)
+		{
+			int m=26;
+			int temp = fmod(k(i,j),m);
+			if(temp < 0)
+			{
+				temp = temp+m;
+			}
+			k(i,j) = temp;
+			row.push_back(k(i,j));
+		}
+		vec.push_back(row);
+	}
+	cout << "The key found is:" << endl;
+	cout << k << endl;
+	return 0;
+ }
+
+ 
+void HillAtt::decrypt(string& in, string& out, vector <vector<int>>& vec)
 {
 	out.clear();
+	
 	const char *ti = in.c_str();
 	vector<int> text;
 	int writeout = 0;
 	for (unsigned int i = 0; i < in.size(); i++) {
         char c;
-        if (!decrypt) {//encrypt
-            c = tolower(ti[i]);
-            if (isalpha(c)) {
-                text.push_back( ((int) c) - 97);
-				writeout++;
-            }
-			
-			if(writeout>0 && (writeout)%vec[0].size()==0)
-			{
-				int sum = 0;
-				for(unsigned int r =0; r < vec.size();r++)
-				{
-					for(unsigned int c = 0; c < vec[0].size();c++)
-					{
-						sum +=vec[r][c]*text[c];
-					}
-					sum%=26;
-					out += toupper(sum+97);
-					sum = 0;
-					writeout = 0;
-				}
-				text.clear();
-			}
-        } 
-		else //decrypt
-		{
-			
-			MatrixXf a(vec[0].size(),vec.size());
+
+			MatrixXf a(vec.size(),vec[0].size());
 			for(unsigned int r = 0 ; r < vec.size();r++)
 			{
 				for(unsigned int c = 0; c <vec[0].size();c++)
@@ -248,7 +272,7 @@ void Hill::encrypt(string& in, string& out , vector <vector<int>> &vec, bool dec
 				}
 			}
 			
-			cout << a << endl;
+			//cout << a << endl;
 			c = toupper(ti[i]);
             if (isalpha(c)) {
                 text.push_back( ((int) c) - 65);
@@ -271,19 +295,19 @@ void Hill::encrypt(string& in, string& out , vector <vector<int>> &vec, bool dec
 				}
 				text.clear();
 			}
-        }
+        //}
 		
     }
 	in = "";
 	if(text.size() > 0)
 	{
-		if(!decrypt)
-		{
+		//if(!decrypt)
+		// {
 			for(unsigned int i = 0; i < text.size();i++)
 			{
 				in+=text[i]+97;
 			}
-		}
+		//}
 
 	}
 	

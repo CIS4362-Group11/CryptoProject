@@ -3,7 +3,7 @@ CFLAGS=-std=c++11 -Wall -g -Iinclude/
 SD=src/
 ID=include/
 BD=build/
-ATTACKS=example.o histogram.o caesar_attack.o ngram.o kasiski.o
+ATTACKS=example.o histogram.o caesar_attack.o ngram.o kasiski.o hillatt.o
 CIPHERS=caesar.o vigenere.o hill.o
 VER=0.1
 TARG=cryptoproject
@@ -41,6 +41,9 @@ kasiski.o: bd $(SD)attacks/kasiski.cpp $(ID)attacks/kasiski.h
 	
 hill.o: bd $(SD)ciphers/hill.cpp $(ID)ciphers/hill.h
 	$(CC) $(CFLAGS) -c $(SD)ciphers/hill.cpp -o $(BD)hill.o
+	
+hillatt.o: bd $(SD)attacks/hillatt.cpp $(ID)attacks/hillatt.h
+	$(CC) $(CFLAGS) -c $(SD)attacks/hillatt.cpp -o $(BD)hillatt.o
 
 $(TARG): main.o module.o $(ATTACKS) $(CIPHERS) $(TOOLS)
 	$(CC) $(CFLAGS) $(BD)main.o $(BD)module.o $(addprefix $(BD), $(ATTACKS)) $(addprefix $(BD), $(CIPHERS)) -o $(TARG)
