@@ -23,5 +23,5 @@ To add a module to this project the following needs to be done:
  - It is imperative that the virtual functions defined in `includes/module.h` are overwritten by your module
 - Add your new header to `includes/main.h` in the correct section towards the bottom
 - Register the module in `src/main.cpp` in the function `register_modules`
- - for example: `m.insert("attacks/mynewmodule", new MyNewModule())`
+ - for example: `m.insert(make_pair("attacks/mynewmodule", new MyNewModule()))`
 - Copy and modify the `example.o` statement in the `makefile` to compile your individual module
