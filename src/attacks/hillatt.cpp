@@ -32,7 +32,7 @@ HillAtt::HillAtt()
 void HillAtt::disp_desc()
 {
     cout << "Module: attacks/HillAtt\n\tUses known plaintext and cipher text to try to crack the key. \n\tBoth the plaintext must be invertible and have a modulus of 26,\n\t all of this is checked in the program.\n\tInput text should be lowercase, symbols are ignored.\n\tCipher text is all uppercase.\n\tPlease define the following required options:\n\t\tPLAINTEXT\tfound in original file\n\t\tCIPHERTEXT\tuppercase corresponds to plaintext" << endl;
-   // disp_opts();
+    disp_opts();
     cout << endl;
 }
 
@@ -93,21 +93,11 @@ int HillAtt::run()
 		return 9;
 	}
 
-			/*MatrixXf a(vec[0].size(),vec.size());
-			for(unsigned int r = 0 ; r < vec.size();r++)
-			{
-				for(unsigned int c = 0; c <vec[0].size();c++)
-				{
-					a(r,c) = vec[r][c];
-				}
-			}*/
-			
 	
 	string passbuff = "";
 	while (getline(in, ibuff)) {
 		passbuff += ibuff;
 		decrypt(passbuff,obuff,vec);
-       // encrypt(passbuff, obuff, vec, decrypt);
 		out << obuff << endl;
     }
 	if(passbuff.length() > 0)//add random character if not a multiple
@@ -116,18 +106,9 @@ int HillAtt::run()
 		{
 			passbuff+="x";
 		}
-		//encrypt(passbuff, obuff, vec);
 		out << obuff << endl;
 	}
 	cout << endl;
-	/*for(unsigned int i = 0;i< vec.size();i++)
-	{
-		for(unsigned int j = 0;j < vec[i].size();j++)
-		{
-			cout << vec[i][j] << " ";
-		}
-		cout << endl;
-	}*/
     in.close();
     out.close();
 	return 0;
