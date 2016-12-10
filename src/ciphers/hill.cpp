@@ -28,7 +28,7 @@ Hill::Hill()
 void Hill::disp_desc()
 {
     cout << "Module: ciphers/Hill\n\tEncrypts (or decrypts) a text file with the hill cipher.\n\tInput text should be lowercase, symbols are ignored.\n\tCipher text is all uppercase.\n\tPlease define the following required options:\n\t\tINPUTFILE\tinput filename\n\t\tKEY\t\tlowercase string key" << endl;
-   // disp_opts();
+    disp_opts();
     cout << endl;
 }
 
