@@ -93,7 +93,6 @@ int HillAtt::run()
 		return 9;
 	}
 
-	
 	string passbuff = "";
 	while (getline(in, ibuff)) {
 		passbuff += ibuff;
@@ -253,7 +252,6 @@ void HillAtt::decrypt(string& in, string& out, vector <vector<int>>& vec)
 				}
 			}
 			
-			//cout << a << endl;
 			c = toupper(ti[i]);
             if (isalpha(c)) {
                 text.push_back( ((int) c) - 65);
@@ -282,13 +280,10 @@ void HillAtt::decrypt(string& in, string& out, vector <vector<int>>& vec)
 	in = "";
 	if(text.size() > 0)
 	{
-		//if(!decrypt)
-		// {
 			for(unsigned int i = 0; i < text.size();i++)
 			{
 				in+=text[i]+97;
 			}
-		//}
 
 	}
 	
